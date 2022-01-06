@@ -38,29 +38,46 @@
 
         <section class="boxTransactions">
           <button class="newTransaction"><i class="fas fa-plus"></i> Nova Transação</button>
-          <div @click="moreInfo(index)" v-for="(transaction, index) in transactions" v-bind:key="transaction.id" class="transactionSingle">
-            <article v-if="transaction['totalValue'] >= 0">
+          <div class="transactionSingle" @click="moreInfo(index)" v-for="(transaction, index) in transactions" v-bind:key="transaction.id">
+            <article class="boxTransactionInfo" v-if="transaction['totalValue'] >= 0">
               <div class="transactionInfo">
                 <p>{{transaction['title']}}</p>
                 <div class="info2">
-                  <p class="positiveValue">R$ {{transaction['totalValue'].toFixed(2)}}</p>
+                  <p class="positiveValue">R$ {{transaction['totalValue'].toFixed(2).replace(".", ",")}}</p>
                   <p  class="arrow"><i class="fas fa-chevron-left"></i></p>
                 </div>
               </div>
               <div class="moreTransactionInfo">
-                more info {{transaction['descrição']}}
+                <div class="fieldTransaction">
+                  <p><b>Descrição:</b> {{transaction['title']}}</p>
+                  <p><b>Valor Guardado:</b> R${{transaction['savedValue'].toFixed(2).replace(".", ",")}}</p>
+                </div>
+                <div class="fieldTransaction">
+                  <p><b>Data:</b> {{transaction['date']}}</p>
+                  <p><b>Valor Liquido:</b> R${{transaction['netValue'].toFixed(2).replace(".", ",")}}</p>
+                </div>
+                <div class="fieldTransaction centerField">
+                  <p><b>Valor Total:</b> R${{transaction['totalValue'].toFixed(2).replace(".", ",")}}</p>
+                </div>
               </div>
             </article>
-            <article v-else>
+            <article class="boxTransactionInfo" v-else>
               <div class="transactionInfo">
                 <p>{{transaction['title']}}</p>
                 <div class="info2">
-                  <p class="negativeValue">R$ {{transaction['totalValue'].toFixed(2)}}</p>
+                  <p class="negativeValue">R$ {{transaction['totalValue'].toFixed(2).replace(".", ",")}}</p>
                   <p class="arrow"><i class="fas fa-chevron-left"></i></p>
                 </div>
               </div>
               <div class="moreTransactionInfo">
-                more info {{transaction['descrição']}}
+                <div class="fieldTransaction">
+                  <p><b>Descrição:</b> {{transaction['title']}}</p>
+                  <p><b>Data:</b> R${{transaction['date']}}</p>
+                </div>
+                <div class="fieldTransaction">
+                  <p><b>Retirado do valor:</b> {{transaction['takenFrom']}}</p>
+                  <p><b>Valor Total:</b> R${{transaction['totalValue']}}</p>
+                </div>
               </div>
             </article>
           </div>
@@ -77,6 +94,7 @@
   .screen{
     min-height: 100vh;
     background: var(--mainBackground);
+    padding-bottom: 50px;
   }
   header{
     width: 100vw;
@@ -184,27 +202,38 @@
   }
   /*boxTransactions*/
   .boxTransactions{
-    width: 85%;
+    width: 60%;
     margin: 0 auto;
-    margin-top: 100px;
+    margin-top: 120px;
+    font-family: 'Courier New', Courier, monospace;
   }
   .newTransaction{
     color: #0096ec;
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: left;
   }
   .newTransaction:hover{
     color: #007fe7;
   }
+  .transactionSingle{
+    width: 100%;
+    max-width:1000px;
+    margin: 0 auto;
+  }
+  .boxTransactionInfo{
+    margin: 15px 0;
+  }
   .transactionInfo{
+    width: 100%;
     background: rgb(255, 255, 255);
-    border: 1px solid #767676;
     cursor: pointer;
-    margin: 5px 0;
     padding: 17px 10px;
     display: flex;
     justify-content: space-between;
-  }
-  .moreTransactionInfo{
-    display: none;
+    box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
   }
   .positiveValue{
     color: #10C522;
@@ -220,6 +249,26 @@
     margin-left: 10px;
     font-size: 12px;
     color: #424242;
+  }
+  .moreTransactionInfo{ 
+    /*display: none;*/
+    padding: 20px 15px 5px 15px;
+    background: white;
+    border-top:1px solid #c2c2c2;
+    box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
+  }
+  .fieldTransaction{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .fieldTransaction{
+    font-family: 'Courier New', Courier, monospace;
+  }
+  .centerField{
+    justify-content: center;
   }
 </style>
 
@@ -246,8 +295,10 @@ export default {
       loggedUser: [],
       theme: '#111319',
       transactions: [
-        {id: 1, title: 'X-box One', data: '25/12/2025', takenFrom: 'Disponivel', totalValue: -20.00},
-        {id: 2, title: 'Salario', data: '25/12/2025', totalValue: 2500.00, netValue: 2000.00, savedValue: 500.00}
+        {id: 1, title: 'Site MaxCorres', date: '25/12/2025', totalValue: 2500.10, netValue: 2000.08, savedValue: 500.02},
+        {id: 2, title: 'X-box One', date: '25/12/2025', takenFrom: 'Disponivel', totalValue: -1000.00},
+        {id: 3, title: 'Site advogado teteu', date: '25/12/2025', totalValue: 500.00, netValue: 300.00, savedValue: 200.00},
+        {id: 4, title: 'torradeira plut', date: '25/12/2025', takenFrom: 'Emergêncial', totalValue: -500.00}
       ]
     };
   },
