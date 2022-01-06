@@ -6,7 +6,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - controlefinanceiro',
+    titleTemplate: '%s - Controle Financeiro',
     title: 'controlefinanceiro',
     htmlAttrs: {
       lang: 'pt_br'
@@ -19,10 +19,6 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-
-      //fonts
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-      { rel: 'stylesheet', href: 'https: //fonts.googleapis.com/css2? family = Permanente + Marcador & família = Poppins: wght @ 200 &family = Rubik: wght @ 300 & display = swap' }
     ],
     script:[
       {src: 'https://kit.fontawesome.com/90bf9437da.js', crossorigin: 'anonymous'}
