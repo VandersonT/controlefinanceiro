@@ -37,7 +37,7 @@
         </section>
 
         <section class="boxTransactions">
-          <button class="newTransaction" @click="newTrasaction()"><i class="fas fa-plus"></i> Nova Transação</button>
+          <button class="newTransaction" @click="toggleBoxNewTransaction()"><i class="fas fa-plus"></i> Nova Transação</button>
           <div class="transactionSingle" v-for="(transaction, index) in transactions" v-bind:key="transaction.id">
             <article class="boxTransactionInfo" v-if="transaction['totalValue'] >= 0">
               <div @click="moreInfo(index)" class="transactionInfo">
@@ -75,11 +75,11 @@
               <div class="moreTransactionInfo">
                 <div class="fieldTransaction">
                   <p><b>Descrição:</b> {{transaction['title']}}</p>
-                  <p><b>Data:</b> R${{transaction['date']}}</p>
+                  <p><b>Data:</b> {{transaction['date']}}</p>
                 </div>
                 <div class="fieldTransaction">
                   <p><b>Retirado do valor:</b> {{transaction['takenFrom']}}</p>
-                  <p><b>Valor Total:</b> R${{transaction['totalValue']}}</p>
+                  <p><b>Valor Retirado:</b> R${{transaction['totalValue']}}</p>
                 </div>
                 <div class="boxButtons">
                   <button @click="deleteTransaction(transaction['id'], index)"><i class="fas fa-trash-alt trashIcon"></i></button>
@@ -89,7 +89,7 @@
           </div>
         </section>
 
-        <section v-if="boxNewTransactionActive" class="screenNewTransaction">
+        <section v-if="showBoxNewTransaction" class="screenNewTransaction">
           <div class="boxNewTransaction">
             <h1>Nova Transação</h1>
             <div class="selectAnAction">
@@ -102,22 +102,27 @@
                 Retirar
               </div>
             </div>
-            <input v-model="titleTransaction" class="fieldTransaction" type="text" placeholder="Titulo da transação" />
+
+            <input v-model="titleTransaction" class="fieldNewTransaction" type="text" placeholder="Titulo da transação" />
+            <p v-if="titleTransactionError" class="error">O maximo de caracteres permitido é 25.</p>
+
+            <input v-model="totalTransactionAmount" class="fieldNewTransaction" type="text" placeholder="Digite o valor total [Ex: 10.000,30]" />
             
-            <input class="fieldTransaction" type="text" placeholder="Digite o valor total" />
+            <input v-if="selectedTransaction == 'deposit'" v-model="savedAmount" class="fieldNewTransaction" type="text" placeholder="Valor para caso de urgência [Ex: 2.000,15] [opcional]" />
+            <p v-if="savedAmountError" class="error">Você não pode guardar um valor maior do que o total.</p>
 
-            <input v-if="selectedTransaction == 'deposit'" class="fieldTransaction" type="text" placeholder="Valor para caso de urgencia (opcional)" />
+            <div v-if="selectedTransaction == 'toWithdraw'" class="boxFieldNewTransaction">
+              <p>De onde deseja retirar o dinheiro?</p>
+              <select v-model="takenFrom">
+                <option selected>Valor Disponivel</option>
+                <option>Valor de Emergência</option>
+              </select>
+            </div>
 
-            <select v-if="selectedTransaction == 'toWithdraw'">
-              <option selected disabled>De onde vai pegar o dinheiro?</option>
-              <option>Valor Disponivel</option>
-              <option>Valor de emergencia</option>
-            </select>
-
-            <input class="fieldTransaction" type="date" placeholder="xx/xx/xxxx" />
+            <input v-model="date" class="fieldNewTransaction" type="date" placeholder="xx/xx/xxxx" />
 
             <div>
-              <button @click="cancelTransaction()" class="button button--cancel">Cancelar</button>
+              <button @click="toggleBoxNewTransaction()" class="button button--cancel">Cancelar</button>
               <button @click="confirmTransaction()" class="button button--confirm">Confirmar</button>
             </div>
 
@@ -353,7 +358,7 @@
   }
   .boxAction{
     margin: 0 10px;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
   }
@@ -369,7 +374,14 @@
   .selected{
     background: rgb(255, 145, 0);
   }
-  .fieldTransaction{
+  .boxFieldNewTransaction{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+  }
+  .fieldNewTransaction{
     width: 90%;
     box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
     -webkit-box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
@@ -377,6 +389,7 @@
     border: 1px solid rgb(172, 172, 172);
     padding: 10px 10px;
     outline: 0;
+    margin: 10px 0;
   }
   .button{
     margin: 10px;
@@ -401,7 +414,7 @@
   }
   .boxNewTransaction select{
     width: 90%;
-    margin-bottom: 20px;
+    margin: 10px 0;
     padding: 10px;
     outline: 0;
     font-size: 17px;
@@ -409,6 +422,10 @@
     -webkit-box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
     -moz-box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
     border: 1px solid rgb(172, 172, 172);;
+  }
+  .error{
+    color: rgb(148, 15, 15);
+    font-size: 14px;
   }
 </style>
 
@@ -443,8 +460,17 @@ export default {
         {id: 5, title: 'ganhei da Be', date: '25/12/2025', totalValue: 800.00, netValue: 800.00, savedValue: 0.00}
       ],
       selectedTransaction: 'deposit',
-      boxNewTransactionActive: false,
-      titleTransaction: ''
+      showBoxNewTransaction: false,
+
+      titleTransaction: '',
+      lastTitleTransactionValid: '',
+      titleTransactionError: false,
+      totalTransactionAmount: '',
+      savedAmount: '',
+      savedAmountError: false,
+      lastSavedAmountValid: '',
+      takenFrom: '',
+      date: ''
     };
   },
   methods:{
@@ -459,7 +485,7 @@ export default {
       }
 
       if(this.transictionSelected == idToOpen){
-        this.transictionSelected = -1;
+        this.transictionSelected = NaN;
       }else{
         allBoxMoreInfo[idToOpen].style.display = 'block';
         arrows[idToOpen].innerHTML = '<i class="fas fa-chevron-down"></i>';
@@ -477,27 +503,57 @@ export default {
       this.transactions.splice(index, 1);
     },
     selectAnAction: function(){
+      (this.selectedTransaction == 'deposit') ? this.selectedTransaction = 'toWithdraw' : this.selectedTransaction = 'deposit';
+      this.savedAmountError = false;
+    },
+    toggleBoxNewTransaction: function(){
+      this.showBoxNewTransaction = !this.showBoxNewTransaction;
+      this.savedAmountError = false;
+    },
+    confirmTransaction: function(){
+
+      let id = (this.transactions == 0) ? 0 : this.transactions.length + 1; 
 
       switch(this.selectedTransaction){
         case 'deposit':
-          this.selectedTransaction = 'toWithdraw';
+          this.totalTransactionAmount = this.totalTransactionAmount.replace('.', '');
+          this.savedAmount = this.savedAmount.replace('.', '');
+
+          this.totalTransactionAmount = this.totalTransactionAmount.replace(',', '.');
+          this.savedAmount = this.savedAmount.replace(',', '.');
+
+          this.transactions.push({id: id, title: this.titleTransaction, date: this.date, totalValue: parseFloat(this.totalTransactionAmount), netValue: (parseFloat(this.totalTransactionAmount) - parseFloat(this.savedAmount)), savedValue: parseFloat(this.savedAmount)})
           break;
         case 'toWithdraw':
-          this.selectedTransaction = 'deposit';
+          alert('bora tirar')
           break;
       }
 
+      //faça o envio ao BD
+      this.showBoxNewTransaction = false;
+    }
+  },
+  watch:{
+    titleTransaction: function(){
+      if(this.titleTransaction.length > 25){
+          this.titleTransaction = this.lastTitleTransactionValid;
+          this.titleTransactionError = true;
+      }else{
+        this.lastTitleTransactionValid = this.titleTransaction;
+      }
     },
-    cancelTransaction: function(){
-      this.boxNewTransactionActive = false;
+    totalTransactionAmount: function(){
+      this.totalTransactionAmount = this.totalTransactionAmount.replace(/[^0-9,.]/g, '');
     },
-    newTrasaction: function(){
-      this.boxNewTransactionActive = true;
-    },
-    confirmTransaction: function(){
-      document.querySelector('.ScreenNewTransaction').style.display = 'flex';
+    savedAmount: function(){
+      this.savedAmount = this.savedAmount.replace(/[^0-9,.]/g, '');
 
-      //envie as informações ao banco de dados
+      if(parseFloat(this.savedAmount) > parseFloat(this.totalTransactionAmount) || !this.totalTransactionAmount){
+        this.savedAmount = this.lastSavedAmountValid;
+        this.savedAmountError = true;
+      }else{
+        this.lastSavedAmountValid = this.savedAmount;
+      }
     }
   }
 }
