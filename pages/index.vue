@@ -104,12 +104,12 @@
             </div>
 
             <input v-model="titleTransaction" class="fieldNewTransaction" type="text" placeholder="Titulo da transação" />
-            <p v-if="titleTransactionError" class="error">O maximo de caracteres permitido é 25.</p>
+            <p v-if="titleTransactionError" class="inputError">O maximo de caracteres permitido é 25.</p>
 
             <input v-model="totalTransactionAmount" class="fieldNewTransaction" type="text" placeholder="Digite o valor total [Ex: 10.000,30]" />
             
             <input v-if="selectedTransaction == 'deposit'" v-model="savedAmount" class="fieldNewTransaction" type="text" placeholder="Valor para caso de urgência [Ex: 2.000,15] [opcional]" />
-            <p v-if="savedAmountError" class="error">Você não pode guardar um valor maior do que o total.</p>
+            <p v-if="savedAmountError" class="inputError">Você não pode guardar um valor maior do que o total.</p>
 
             <div v-if="selectedTransaction == 'toWithdraw'" class="boxFieldNewTransaction">
               <p>De onde deseja retirar o dinheiro?</p>
@@ -136,7 +136,7 @@
 
 
 <style scoped>
-  /*HEADER*/
+  /*-------HEADER-------*/
   .screen{
     min-height: 100vh;
     background: var(--mainBackground);
@@ -174,16 +174,8 @@
   .menuButton button:active{
     background: rgb(207, 201, 192);
   }
-  .button__close{
-    background: rgb(170, 12, 12) !important;
-    color: rgb(255, 255, 255) !important;
-  }
-  .button__close:active{
-    background: rgb(156, 10, 10) !important;
-    color: rgb(230, 230, 230) !important;
-  }
 
-  /*boxFinanceInfo*/
+  /*-------Main > boxFinanceInfo-------*/
   .boxFinanceInfo{
     width: 100vw;
     max-width: 100%;
@@ -246,7 +238,8 @@
     background: #056be0;
     color: rgb(255, 255, 255);
   }
-  /*boxTransactions*/
+
+  /*-------Main > boxTransactions-------*/
   .boxTransactions{
     width: 60%;
     margin: 0 auto;
@@ -327,7 +320,8 @@
   .trashIcon{
     color: rgb(134, 10, 10);
   }
-  /*ScreenNewTransaction*/
+
+  /*-------Main > ScreenNewTransaction-------*/
   .screenNewTransaction{
     position: fixed;
     top: 0;
@@ -362,18 +356,6 @@
     display: flex;
     align-items: center;
   }
-  .select{
-    width: 13px;
-    height: 13px;
-    margin-right: 5px;
-    border: 1px solid rgb(163, 163, 163);
-    background: rgb(223, 223, 223);
-    border-radius: 10px;
-    cursor: pointer;
-  }
-  .selected{
-    background: rgb(255, 145, 0);
-  }
   .boxFieldNewTransaction{
     width: 100%;
     display: flex;
@@ -391,27 +373,6 @@
     outline: 0;
     margin: 10px 0;
   }
-  .button{
-    margin: 10px;
-    padding: 10px 25px;
-    border-radius: 5px;
-  }
-  .button--cancel{
-    border: 2px solid #da4d4d !important;
-    color: #da4d4d !important;
-  }
-  .button--cancel:hover{
-    border: 2px solid rgb(240, 10, 10) !important;
-    color: rgb(240, 10, 10)!important;
-  }
-  .button--confirm{
-    background: #38CF1F !important;
-    color: white !important;
-  }
-  .button--confirm:hover{
-    background: #37c51e !important;
-    color: rgb(230, 230, 230) !important;
-  }
   .boxNewTransaction select{
     width: 90%;
     margin: 10px 0;
@@ -423,10 +384,9 @@
     -moz-box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
     border: 1px solid rgb(172, 172, 172);;
   }
-  .error{
-    color: rgb(148, 15, 15);
-    font-size: 14px;
-  }
+
+  /*-------Responsive-------*/
+
 </style>
 
 
@@ -477,6 +437,7 @@ export default {
       date: ''
     };
   },
+
   methods:{
     moreTransactionInfo: function(idToOpen){
       let allBoxMoreInfo = document.querySelectorAll('.moreTransactionInfo');
@@ -600,6 +561,7 @@ export default {
       document.body.style.setProperty('--systemTitleColor', 'black');
     },
   },
+  
   watch:{
     titleTransaction: function(){
       if(this.titleTransaction.length > 25){
