@@ -518,16 +518,16 @@ export default {
       }
 
       let id = (this.transactions == 0) ? 0 : this.transactions.length + 1; 
+      this.totalTransactionAmount = this.totalTransactionAmount.replace('.', '');
+      this.totalTransactionAmount = this.totalTransactionAmount.replace(',', '.');
 
       switch(this.selectedTransaction){
         case 'deposit':
 
           (this.savedAmount) ? '' : this.savedAmount = '0,00';
 
-          this.totalTransactionAmount = this.totalTransactionAmount.replace('.', '');
           this.savedAmount = this.savedAmount.replace('.', '');
-
-          this.totalTransactionAmount = this.totalTransactionAmount.replace(',', '.');
+          
           this.savedAmount = this.savedAmount.replace(',', '.');
 
           this.transactions.push({id: id, title: this.titleTransaction, date: this.date, totalValue: parseFloat(this.totalTransactionAmount), netValue: (parseFloat(this.totalTransactionAmount) - parseFloat(this.savedAmount)), savedValue: parseFloat(this.savedAmount)})
@@ -537,7 +537,7 @@ export default {
             alert('Por favor, preencha todos os campos');
             return false;
           }
-          alert('bora tirar')
+          this.transactions.push({id: id, title: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, totalValue: (~parseFloat(this.totalTransactionAmount) + 1)});
           break;
       }
 
