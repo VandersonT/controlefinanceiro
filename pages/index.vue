@@ -512,10 +512,18 @@ export default {
     },
     confirmTransaction: function(){
 
+      if(!this.titleTransaction || !this.totalTransactionAmount || !this.date){
+        alert('Por favor, preencha todos os campos');
+        return false;
+      }
+
       let id = (this.transactions == 0) ? 0 : this.transactions.length + 1; 
 
       switch(this.selectedTransaction){
         case 'deposit':
+
+          (this.savedAmount) ? '' : this.savedAmount = '0,00';
+
           this.totalTransactionAmount = this.totalTransactionAmount.replace('.', '');
           this.savedAmount = this.savedAmount.replace('.', '');
 
@@ -525,12 +533,25 @@ export default {
           this.transactions.push({id: id, title: this.titleTransaction, date: this.date, totalValue: parseFloat(this.totalTransactionAmount), netValue: (parseFloat(this.totalTransactionAmount) - parseFloat(this.savedAmount)), savedValue: parseFloat(this.savedAmount)})
           break;
         case 'toWithdraw':
+          if(!this.takenFrom){
+            alert('Por favor, preencha todos os campos');
+            return false;
+          }
           alert('bora tirar')
           break;
       }
 
       //faça o envio ao BD
       this.showBoxNewTransaction = false;
+      this.titleTransaction = '',
+      this.lastTitleTransactionValid = '',
+      this.titleTransactionError = false,
+      this.totalTransactionAmount = '',
+      this.savedAmount = '',
+      this.savedAmountError = false,
+      this.lastSavedAmountValid = '',
+      this.takenFrom = '',
+      this.date = ''
     }
   },
   watch:{
