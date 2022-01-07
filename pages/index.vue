@@ -40,7 +40,7 @@
           <button class="newTransaction" @click="toggleBoxNewTransaction()"><i class="fas fa-plus"></i> Nova Transação</button>
           <div class="transactionSingle" v-for="(transaction, index) in transactions" v-bind:key="transaction.id">
             <article class="boxTransactionInfo" v-if="transaction['totalValue'] >= 0">
-              <div @click="moreInfo(index)" class="transactionInfo">
+              <div @click="moreTransactionInfo(index)" class="transactionInfo">
                 <p>{{transaction['title']}}</p>
                 <div class="info2">
                   <p class="positiveValue">R$ {{transaction['totalValue'].toFixed(2).replace(".", ",")}}</p>
@@ -65,7 +65,7 @@
               </div>
             </article>
             <article class="boxTransactionInfo" v-else>
-              <div @click="moreInfo(index)" class="transactionInfo">
+              <div @click="moreTransactionInfo(index)" class="transactionInfo">
                 <p>{{transaction['title']}}</p>
                 <div class="info2">
                   <p class="negativeValue">R$ {{transaction['totalValue'].toFixed(2).replace(".", ",")}}</p>
@@ -94,11 +94,11 @@
             <h1>Nova Transação</h1>
             <div class="selectAnAction">
               <div class="boxAction">
-                <button @click="selectAnAction()" class="select" :class="selectedTransaction == 'deposit' ? 'selected' : ''"></button>
+                <button @click="selectAnAction('deposit')" class="select" :class="selectedTransaction == 'deposit' ? 'selected' : ''"></button>
                 Depositar
               </div>
               <div class="boxAction">
-                <button @click="selectAnAction()" class="select" :class="selectedTransaction == 'toWithdraw' ? 'selected' : ''"></button>
+                <button @click="selectAnAction('toWithdraw')" class="select" :class="selectedTransaction == 'toWithdraw' ? 'selected' : ''"></button>
                 Retirar
               </div>
             </div>
@@ -448,9 +448,12 @@ export default {
   },
   data: () =>{
     return {
+      /*System Datas*/
       isLogged: false,
       loggedUser: [],
       theme: '#111319',
+      
+      /*New Transaction Datas*/
       transictionSelected: -1,
       transactions: [
         {id: 1, title: 'Site MaxCorres', date: '25/12/2025', totalValue: 2500.10, netValue: 2000.08, savedValue: 500.02},
@@ -462,6 +465,7 @@ export default {
       selectedTransaction: 'deposit',
       showBoxNewTransaction: false,
 
+      /*New Transaction Fields*/
       titleTransaction: '',
       lastTitleTransactionValid: '',
       titleTransactionError: false,
@@ -474,7 +478,7 @@ export default {
     };
   },
   methods:{
-    moreInfo: function(idToOpen){
+    moreTransactionInfo: function(idToOpen){
       let allBoxMoreInfo = document.querySelectorAll('.moreTransactionInfo');
       let arrows = document.querySelectorAll('.arrow');
       
@@ -502,8 +506,8 @@ export default {
       //faça uma nova requisição para saber os novos valores da informações principais lá dos blocos
       this.transactions.splice(index, 1);
     },
-    selectAnAction: function(){
-      (this.selectedTransaction == 'deposit') ? this.selectedTransaction = 'toWithdraw' : this.selectedTransaction = 'deposit';
+    selectAnAction: function(action){
+      this.selectedTransaction = action;
       this.savedAmountError = false;
     },
     toggleBoxNewTransaction: function(){
@@ -512,36 +516,48 @@ export default {
     },
     confirmTransaction: function(){
 
-      if(!this.titleTransaction || !this.totalTransactionAmount || !this.date){
+      if(!this.fieldsValidate()){
         alert('Por favor, preencha todos os campos');
         return false;
       }
 
+      this.formatValueToReal();
+
+      /*Get ID to add a new transaction*/
       let id = (this.transactions == 0) ? 0 : this.transactions.length + 1; 
-      this.totalTransactionAmount = this.totalTransactionAmount.replace('.', '');
-      this.totalTransactionAmount = this.totalTransactionAmount.replace(',', '.');
 
       switch(this.selectedTransaction){
         case 'deposit':
-
-          (this.savedAmount) ? '' : this.savedAmount = '0,00';
-
-          this.savedAmount = this.savedAmount.replace('.', '');
-          
-          this.savedAmount = this.savedAmount.replace(',', '.');
-
           this.transactions.push({id: id, title: this.titleTransaction, date: this.date, totalValue: parseFloat(this.totalTransactionAmount), netValue: (parseFloat(this.totalTransactionAmount) - parseFloat(this.savedAmount)), savedValue: parseFloat(this.savedAmount)})
           break;
         case 'toWithdraw':
-          if(!this.takenFrom){
-            alert('Por favor, preencha todos os campos');
-            return false;
-          }
           this.transactions.push({id: id, title: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, totalValue: (~parseFloat(this.totalTransactionAmount) + 1)});
           break;
       }
 
-      //faça o envio ao BD
+      //faça o envio ao BD Aqui
+      
+      this.resetTransactionsFields();
+    },
+    fieldsValidate: function(){
+      if(!this.titleTransaction || !this.totalTransactionAmount || !this.date)
+        return false;
+
+      if(!this.takenFrom && (this.selectedTransaction == 'toWithdraw'))
+        return false;
+
+      return true;
+    },
+    formatValueToReal: function(){
+      if(this.selectedTransaction == 'deposit'){
+          (this.savedAmount) ? '' : this.savedAmount = '0,00';
+          this.savedAmount = this.savedAmount.replace('.', '');
+          this.savedAmount = this.savedAmount.replace(',', '.');
+      }
+      this.totalTransactionAmount = this.totalTransactionAmount.replace('.', '');
+      this.totalTransactionAmount = this.totalTransactionAmount.replace(',', '.');
+    },
+    resetTransactionsFields: function(){
       this.showBoxNewTransaction = false;
       this.titleTransaction = '',
       this.lastTitleTransactionValid = '',
@@ -552,7 +568,37 @@ export default {
       this.lastSavedAmountValid = '',
       this.takenFrom = '',
       this.date = ''
-    }
+    },
+    changeToDefaultTheme: function(){
+      document.body.style.setProperty('--mainBackground', '#C9C9C9');
+      document.body.style.setProperty('--header', '#111319');
+      document.body.style.setProperty('--systemTitleBackground', '#171A21');
+      document.body.style.setProperty('--systemTitleColor', 'white');
+    },
+    changeToTheme1: function(){
+      document.body.style.setProperty('--mainBackground', '#F3D2FF');
+      document.body.style.setProperty('--header', '#AC348B');
+      document.body.style.setProperty('--systemTitleBackground', '#D26AD4');
+      document.body.style.setProperty('--systemTitleColor', 'white');
+    },
+    changeToTheme2: function(){
+      document.body.style.setProperty('--mainBackground', '#171A21');
+      document.body.style.setProperty('--header', '#0B0B0B');
+      document.body.style.setProperty('--systemTitleBackground', '#0F0F0F');
+      document.body.style.setProperty('--systemTitleColor', 'white');
+    },
+    changeToTheme3: function(){
+      document.body.style.setProperty('--mainBackground', '#DEDEDE');
+      document.body.style.setProperty('--header', '#1A1423');
+      document.body.style.setProperty('--systemTitleBackground', '#3D314A');
+      document.body.style.setProperty('--systemTitleColor', 'white');
+    },
+    changeToTheme4: function(){
+      document.body.style.setProperty('--mainBackground', '#DCDCDC');
+      document.body.style.setProperty('--header', '#999999');
+      document.body.style.setProperty('--systemTitleBackground', '#B9B9B9');
+      document.body.style.setProperty('--systemTitleColor', 'black');
+    },
   },
   watch:{
     titleTransaction: function(){
@@ -575,6 +621,26 @@ export default {
       }else{
         this.lastSavedAmountValid = this.savedAmount;
       }
+    }
+  },
+  mounted: function(){
+    let theme = 'default';
+    switch(theme){
+      case 'default':
+        this.changeToDefaultTheme();
+        break;
+      case 'theme1':
+        this.changeToTheme1();
+        break;
+      case 'theme2':
+        this.changeToTheme2();
+        break;
+      case 'theme3':
+        this.changeToTheme3();
+        break;
+      case 'theme4':
+        this.changeToTheme4();
+        break;
     }
   }
 }
