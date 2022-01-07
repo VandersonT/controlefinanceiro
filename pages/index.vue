@@ -16,6 +16,7 @@
       </header>
 
       <main>
+        <!--Floating Section with available and emergency value-->
         <section class="boxFinanceInfo">
           <h1><i class="fas fa-dollar-sign"></i> Controle Financeiro</h1>
           <div class="boxInfoFinance">
@@ -37,8 +38,11 @@
         </section>
 
         <section class="boxTransactions">
+          <!--Open Box New Transaction-->
           <button class="newTransaction" @click="toggleBoxNewTransaction()"><i class="fas fa-plus"></i> Nova Transação</button>
+          
           <div class="transactionSingle" v-for="(transaction, index) in transactions" v-bind:key="transaction.id">
+            <!--Positive Transaction structure-->
             <article class="boxTransactionInfo" v-if="transaction['totalValue'] >= 0">
               <div @click="moreTransactionInfo(index)" class="transactionInfo">
                 <p>{{transaction['title']}}</p>
@@ -64,6 +68,8 @@
                 </div>
               </div>
             </article>
+
+            <!--Negative Transaction structure-->
             <article class="boxTransactionInfo" v-else>
               <div @click="moreTransactionInfo(index)" class="transactionInfo">
                 <p>{{transaction['title']}}</p>
@@ -86,12 +92,16 @@
                 </div>
               </div>
             </article>
+
           </div>
         </section>
 
+        <!--Section To Send New Transaction-->
         <section v-if="showBoxNewTransaction" class="screenNewTransaction">
           <div class="boxNewTransaction">
+            
             <h1>Nova Transação</h1>
+            
             <div class="selectAnAction">
               <div class="boxAction">
                 <button @click="selectAnAction('deposit')" class="select" :class="selectedTransaction == 'deposit' ? 'selected' : ''"></button>
@@ -561,7 +571,7 @@ export default {
       document.body.style.setProperty('--systemTitleColor', 'black');
     },
   },
-  
+
   watch:{
     titleTransaction: function(){
       if(this.titleTransaction.length > 25){
