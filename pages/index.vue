@@ -1,18 +1,20 @@
 <template>
     <div class="screen">
       <header>
-        <div class="welcomeUser">
-          <img src="https://files.jornaluniao.com.br/conteudos/95213.jpg" alt="imagem de perfil" />
-          <p>Olá, {{isLogged ? 'Nome Usuário' : 'Usuário Desconhecido'}} <i class="far fa-smile-beam"></i></p>
-        </div>
-        <div v-if="isLogged" class="menuButton">
-          <button>Meu Perfil</button>
-          <button class="button__close">Sair</button>
-        </div>
-        <div v-else class="menuButton">
-          <button>Cadastrar</button>
-          <button>Login</button>
-        </div>
+        <section class="welcomeUser">
+          <img :src="(isLogged) ? loggedUser['avatar'] : 'images/no-picture.png' " alt="imagem de perfil" />
+          <p>Olá, {{isLogged ? 'Nome Usuário' : 'Desconhecido'}}, tudo bom? <i class="far fa-smile-beam"></i></p>
+        </section>
+        <section class="menuDesktop">
+          <div v-if="isLogged" class="menuButton">
+            <button>Meu Perfil</button>
+            <button class="button__close">Sair</button>
+          </div>
+          <div v-else class="menuButton">
+            <button>Cadastrar</button>
+            <button>Login</button>
+          </div>
+        </section>
       </header>
 
       <main>
@@ -32,7 +34,7 @@
                   <span>Emergência</span>
                   <i class="fas fa-lock emergency"></i>
                 </div>
-                <p class="infoFinanceSingle--value">R$ 140.000,00</p>
+                <p class="infoFinanceSingle--value">R$ 0,00</p>
               </div>
           </div>
         </section>
@@ -41,6 +43,10 @@
           <!--Open Box New Transaction-->
           <button class="newTransaction" @click="toggleBoxNewTransaction()"><i class="fas fa-plus"></i> Nova Transação</button>
           
+          <warning v-if="loggedUser['access'] == 0" msg="Ative sua conta no seu email para usar o sistema sem nenhum problema."/>
+          
+          <warning v-if="!isLogged" msg="Crie uma conta para ter acesso as suas transações de qualquer lugar."/>
+
           <div class="transactionSingle" v-for="(transaction, index) in transactions" v-bind:key="transaction.id">
             <!--Positive Transaction structure-->
             <article class="boxTransactionInfo" v-if="transaction['totalValue'] >= 0">
@@ -205,22 +211,27 @@
     font-size: 25px;
   }
   .boxInfoFinance{
+    width: 100vw;
+    max-width: 100%;
     position: absolute;
-    top: 24%;
+    top: 170px;
     display: flex;
+    justify-content: center;
   }
   .infoFinanceSingle{
-    min-width: 250px;
+    width: 250px;
     padding: 20px;
     background: rgb(255, 255, 255);
     color: black;
     border-radius: 5px;
-    margin-right: 100px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     -webkit-box-shadow: -3px 0px 15px -3px #000000; 
     box-shadow: -3px 0px 15px -3px #000000;
+  }
+  .infoFinanceSingle:nth-child(1){
+    margin-right: 100px;
   }
   .infoFinanceSingle--title{
     display: flex;
@@ -268,7 +279,7 @@
   }
   .transactionSingle{
     width: 100%;
-    max-width:1000px;
+    max-width: 1000px;
     margin: 0 auto;
   }
   .boxTransactionInfo{
@@ -396,7 +407,85 @@
   }
 
   /*-------Responsive-------*/
+  @media screen and (max-width: 950px){
+    /*Main > boxFinanceInfo*/
+    .boxFinanceInfo h1 i{font-size: 18px;}
+    .boxFinanceInfo h1{font-size: 20px;}
+    .infoFinanceSingle{
+      width: 220px;
+      padding: 15px;
+    }
+    .infoFinanceSingle:nth-child(1){margin-right: 30px;}
+    .infoFinanceSingle--title span{font-size: 16px;}
+    .up{font-size: 24px;}
+    .emergency{font-size: 20px;}
+    .infoFinanceSingle--value{font-size: 23px;}
 
+    /*Main > boxTransactions*/
+    .boxTransactions{
+      width: 80%;
+    }
+    .transactionInfo{
+      font-size: 13px;
+    }
+    .fieldTransaction{
+      font-size: 13px;
+    }
+  }
+
+  @media screen and (max-width: 830px){
+    .menuDesktop{
+      display: none;
+    }
+  }
+
+  @media screen and (max-width: 680px){
+    /*HEADER*/
+    .welcomeUser img{
+      width: 45px;
+      height: 45px;
+    }
+    .welcomeUser p{
+      font-size: 14px;
+    }
+    /*Main > boxFinanceInfo*/
+    .infoFinanceSingle{
+      width: 190px;
+    }
+    .infoFinanceSingle--title span{font-size: 15px;}
+    .up{font-size: 22px;}
+    .emergency{font-size: 18px;}
+    .infoFinanceSingle--value{font-size: 20px;}
+
+    /*Main > boxTransactions*/
+    .newTransaction{font-size: 14px;}
+  }
+
+  @media screen and (max-width: 500px){
+    /*Main > boxFinanceInfo*/
+    .infoFinanceSingle{
+      width: calc(80% / 2);
+    }
+    .up{font-size: 20px;}
+    .emergency{font-size: 17px;}
+    .infoFinanceSingle--value{font-size: 18px;}
+    /*Main > boxTransactions*/
+    .boxTransactions{
+      width: 90%;
+    }
+  }
+
+  @media screen and (max-width: 390px){
+     /*Main > boxFinanceInfo*/
+    .boxInfoFinance{
+      top: 180px;
+    }
+    /*Main > boxFinanceInfo*/
+    .infoFinanceSingle--title span{font-size: 13px;}
+    .up{font-size: 15px;}
+    .emergency{font-size: 14px;}
+    .infoFinanceSingle--value{font-size: 12px;}
+  }
 </style>
 
 
