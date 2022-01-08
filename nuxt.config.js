@@ -18,14 +18,18 @@ export default {
       { name: 'format-detection', content: 'telephone=no' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      
+      /*Fonts*/
+      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+      { rel: 'preconnect', href: 'https://fonts.gstatic.com' },
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Roboto+Condensed:wght@300&display=swap' },
+      
     ],
     script:[
       {src: 'https://kit.fontawesome.com/90bf9437da.js', crossorigin: 'anonymous'}
     ]
   },
-
-  
 
 
   // Global CSS: https://go.nuxtjs.dev/config-css

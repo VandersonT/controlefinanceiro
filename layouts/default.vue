@@ -17,6 +17,15 @@
       margin: 0 auto;
       overflow: auto;
     }
+    .link{
+      color: #00A3FF;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .link:hover{
+      color: #0093e9;
+    }
   /*------------------------------------*/
 
   /*--------------Flash's---------------*/
