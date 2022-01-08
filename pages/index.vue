@@ -56,7 +56,7 @@
           
           <warning v-if="loggedUser['access'] == 0" msg="Ative sua conta no seu email para usar o sistema sem nenhum problema."/>
           
-          <warning v-if="!isLogged" msg="Crie uma conta para ter acesso as suas transações de qualquer lugar."/>
+          <warning v-if="!isLogged" msg="Crie uma conta para ter acesso às suas transações de qualquer lugar."/>
 
           <div class="transactionSingle" v-for="(transaction, index) in transactions" v-bind:key="transaction.id">
             <!--Positive Transaction structure-->
@@ -393,7 +393,7 @@
     align-items: center;
   }
   .boxNewTransaction{
-    width: 500px;
+    width: 480px;
     background: white;
     display: flex;
     flex-direction: column;
@@ -508,6 +508,15 @@
     /*Main > boxTransactions*/
     .boxTransactions{
       width: 90%;
+    }
+    /*Main > ScreenNewTransaction*/
+    .boxNewTransaction{
+      width: 90%;
+    }
+
+    .boxNewTransaction select,
+    .fieldNewTransaction{
+      font-size: 12px;
     }
   }
 

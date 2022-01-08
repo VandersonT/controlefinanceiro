@@ -45,8 +45,15 @@
       color: rgb(240, 10, 10)!important;
     }
 
+    @media screen and (max-width: 430px) {
+      .button{
+        padding: 7px 10px;
+      }
+    }
+
     /*Button Confirm*/
     .button--confirm{
+      border: 2px solid transparent !important;
       background: #38CF1F !important;
       color: white !important;
     }
