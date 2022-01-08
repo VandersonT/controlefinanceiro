@@ -1,20 +1,31 @@
 <template>
     <div class="screen">
       <header>
+
         <section class="welcomeUser">
           <img :src="(isLogged) ? loggedUser['avatar'] : 'images/no-picture.png' " alt="imagem de perfil" />
           <p>Olá, {{isLogged ? 'Nome Usuário' : 'Desconhecido'}}, tudo bom? <i class="far fa-smile-beam"></i></p>
         </section>
+
         <section class="menuDesktop">
           <div v-if="isLogged" class="menuButton">
             <button>Meu Perfil</button>
             <button class="button__close">Sair</button>
           </div>
           <div v-else class="menuButton">
-            <button>Cadastrar</button>
             <button>Login</button>
+            <button>Cadastrar</button>
           </div>
         </section>
+
+        <section class="boxMenuMobile">
+          <button @click="activeMobileMenu()" class="btnOpenMenuMobile"><i class="fas fa-bars"></i></button>
+          <div class="menuMobile" v-if="mobileMenuIsActive">
+            <button>Login</button>
+            <button>Cadastrar</button>
+          </div>
+        </section>
+
       </header>
 
       <main>
@@ -189,6 +200,32 @@
   }
   .menuButton button:active{
     background: rgb(207, 201, 192);
+  }
+  .boxMenuMobile{display: none;}
+
+  .btnOpenMenuMobile{font-size: 26px;}
+
+  .menuMobile{
+    padding: 10px 20px;
+    background: rgb(235, 235, 235);
+    position: fixed;
+    right: 2%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 3px;
+    border: 1px solid gray;
+  }
+  .menuMobile button{
+    padding: 10px 25px;
+    border-radius: 5px;
+    border: rgb(26, 26, 26) 1px solid;
+    color: rgb(26, 26, 26);
+  }
+  .menuMobile button:nth-child(1){
+    margin-bottom: 10px;
+  }
+  .menuMobile button:active{
+    background: rgb(219, 219, 219);
   }
 
   /*-------Main > boxFinanceInfo-------*/
@@ -434,9 +471,8 @@
   }
 
   @media screen and (max-width: 830px){
-    .menuDesktop{
-      display: none;
-    }
+    .menuDesktop{display: none;}
+    .boxMenuMobile{display: block;}
   }
 
   @media screen and (max-width: 680px){
@@ -511,6 +547,7 @@ export default {
       isLogged: false,
       loggedUser: [],
       theme: '#111319',
+      mobileMenuIsActive: false,
       
       /*New Transaction Datas*/
       transictionSelected: -1,
@@ -538,6 +575,9 @@ export default {
   },
 
   methods:{
+    activeMobileMenu: function(){
+      this.mobileMenuIsActive = !this.mobileMenuIsActive;
+    },
     moreTransactionInfo: function(idToOpen){
       let allBoxMoreInfo = document.querySelectorAll('.moreTransactionInfo');
       let arrows = document.querySelectorAll('.arrow');
