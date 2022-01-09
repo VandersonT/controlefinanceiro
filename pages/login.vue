@@ -47,7 +47,8 @@
     main{
         width: 100vw;
         max-width: 100%;
-        height: 100vh;
+        min-height: 100vh;
+        padding: 10px 0 20px 0;
         display: flex;
         justify-content: center;
         align-items: center;

@@ -225,6 +225,8 @@
     .selectAnAction{
       margin: 0 auto;
       display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
     }
     .boxAction{
       margin: 0 10px;
@@ -263,5 +265,16 @@
     }
     .keepConnected input[type=checkbox]{
         margin-right: 4px;
+    }
+    /*RESPONSIVE*/
+    @media screen and (max-width: 630px){
+        .profileBox{
+            width: 90%;
+        }
+    }
+    @media screen and (max-width: 500px){
+        .styleInput{
+            width: 90%;
+        }
     }
 </style>
