@@ -3,7 +3,7 @@
 
     <section class="errorBox">
       <img :src="this.error.statusCode === 404 ? 'images/404.png' : 'images/error.png'" />
-      <h1>Oooops...</h1>
+      <h1>Ooops...</h1>
       <h3>{{this.error.statusCode === 404 ? 'Página não encontrada' : 'Ocorreu algum erro'}}</h3>
       <button class="goHomeButton">Home</button>
     </section>
@@ -54,7 +54,8 @@
     margin-bottom: 30px;
   }
   .errorBox h1{
-    font-size: 30px;
+    font-size: 34px;
+    margin-bottom: 7px;
     color: rgb(58, 58, 58);
     font-weight: lighter;
   }
