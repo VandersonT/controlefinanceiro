@@ -136,6 +136,223 @@
 
 </template>
 
+<script>
+  export default {
+    name: 'IndexPage',
+    head: {
+      title: 'Home',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        {
+          hid: 'description',
+          name: 'description',
+          content: 'Gerencie seu dinheiro com muito mais facilidade e de forma 100% gratuita. Registre todas as entradas e saidas e tenha um melhor controle da sua vida financeira.'
+        }
+      ],
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
+    },
+    data: () =>{
+      return {
+        /*System Datas*/
+        isLogged: false,
+        loggedUser: [],
+
+        /*New Transaction Datas*/
+        transictionSelected: -1,
+        transactions: [
+          {id: 1, title: 'Site MaxCorres', date: '25/12/2025', totalValue: 2500.10, netValue: 2000.08, savedValue: 500.02},
+          {id: 2, title: 'X-box One', date: '25/12/2025', takenFrom: 'Disponivel', totalValue: -1000.00},
+          {id: 3, title: 'Site advogado teteu', date: '25/12/2025', totalValue: 500.00, netValue: 300.00, savedValue: 200.00},
+          {id: 4, title: 'torradeira plut', date: '25/12/2025', takenFrom: 'Emergêncial', totalValue: -500.00},
+          {id: 5, title: 'ganhei da Be', date: '25/12/2025', totalValue: 800.00, netValue: 800.00, savedValue: 0.00}
+        ],
+        selectedTransaction: 'deposit',
+        showBoxNewTransaction: false,
+
+        /*New Transaction Fields*/
+        titleTransaction: '',
+        lastTitleTransactionValid: '',
+        titleTransactionError: false,
+        totalTransactionAmount: '',
+        savedAmount: '',
+        savedAmountError: false,
+        lastSavedAmountValid: '',
+        takenFrom: '',
+        date: ''
+      };
+    },
+
+    methods:{
+      moreTransactionInfo: function(idToOpen){
+        let allBoxMoreInfo = document.querySelectorAll('.moreTransactionInfo');
+        let arrows = document.querySelectorAll('.arrow');
+        
+        for(let i = 0; i < allBoxMoreInfo.length; i++){
+          allBoxMoreInfo[i].style.display = 'none';
+          arrows[i].innerHTML = '';
+          arrows[i].innerHTML = '<i class="fas fa-chevron-left"></i>'
+        }
+
+        if(this.transictionSelected == idToOpen){
+          this.transictionSelected = NaN;
+        }else{
+          allBoxMoreInfo[idToOpen].style.display = 'block';
+          arrows[idToOpen].innerHTML = '<i class="fas fa-chevron-down"></i>';
+          this.transictionSelected = idToOpen;
+        }
+      },
+      deleteTransaction: function(idTransaction, index){
+
+        if(!confirm('Tem certeza que deseja apagar essa transição?')){
+          return false;
+        }
+
+        //deleta no banco de dados a transição id: idTransaction
+        //faça uma nova requisição para saber os novos valores da informações principais lá dos blocos
+        this.transactions.splice(index, 1);
+      },
+      selectAnAction: function(action){
+        this.selectedTransaction = action;
+        this.savedAmountError = false;
+      },
+      toggleBoxNewTransaction: function(){
+        this.showBoxNewTransaction = !this.showBoxNewTransaction;
+        this.savedAmountError = false;
+      },
+      confirmTransaction: function(){
+
+        if(!this.fieldsValidate()){
+          alert('Por favor, preencha todos os campos');
+          return false;
+        }
+
+        this.formatValueToReal();
+
+        /*Get ID to add a new transaction*/
+        let id = (this.transactions == 0) ? 0 : this.transactions.length + 1; 
+
+        switch(this.selectedTransaction){
+          case 'deposit':
+            this.transactions.push({id: id, title: this.titleTransaction, date: this.date, totalValue: parseFloat(this.totalTransactionAmount), netValue: (parseFloat(this.totalTransactionAmount) - parseFloat(this.savedAmount)), savedValue: parseFloat(this.savedAmount)})
+            break;
+          case 'toWithdraw':
+            this.transactions.push({id: id, title: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, totalValue: (~parseFloat(this.totalTransactionAmount) + 1)});
+            break;
+        }
+
+        //faça o envio ao BD Aqui
+        
+        this.resetTransactionsFields();
+      },
+      fieldsValidate: function(){
+        if(!this.titleTransaction || !this.totalTransactionAmount || !this.date)
+          return false;
+
+        if(!this.takenFrom && (this.selectedTransaction == 'toWithdraw'))
+          return false;
+
+        return true;
+      },
+      formatValueToReal: function(){
+        if(this.selectedTransaction == 'deposit'){
+            (this.savedAmount) ? '' : this.savedAmount = '0,00';
+            this.savedAmount = this.savedAmount.replace('.', '');
+            this.savedAmount = this.savedAmount.replace(',', '.');
+        }
+        this.totalTransactionAmount = this.totalTransactionAmount.replace('.', '');
+        this.totalTransactionAmount = this.totalTransactionAmount.replace(',', '.');
+      },
+      resetTransactionsFields: function(){
+        this.showBoxNewTransaction = false;
+        this.titleTransaction = '',
+        this.lastTitleTransactionValid = '',
+        this.titleTransactionError = false,
+        this.totalTransactionAmount = '',
+        this.savedAmount = '',
+        this.savedAmountError = false,
+        this.lastSavedAmountValid = '',
+        this.takenFrom = '',
+        this.date = ''
+      },
+      changeToDefaultTheme: function(){
+        document.body.style.setProperty('--mainBackground', '#C9C9C9');
+        document.body.style.setProperty('--header', '#111319');
+        document.body.style.setProperty('--systemTitleBackground', '#171A21');
+        document.body.style.setProperty('--systemTitleColor', 'white');
+      },
+      changeToTheme1: function(){
+        document.body.style.setProperty('--mainBackground', '#F3D2FF');
+        document.body.style.setProperty('--header', '#AC348B');
+        document.body.style.setProperty('--systemTitleBackground', '#D26AD4');
+        document.body.style.setProperty('--systemTitleColor', 'white');
+      },
+      changeToTheme2: function(){
+        document.body.style.setProperty('--mainBackground', '#171A21');
+        document.body.style.setProperty('--header', '#0B0B0B');
+        document.body.style.setProperty('--systemTitleBackground', '#0F0F0F');
+        document.body.style.setProperty('--systemTitleColor', 'white');
+      },
+      changeToTheme3: function(){
+        document.body.style.setProperty('--mainBackground', '#DEDEDE');
+        document.body.style.setProperty('--header', '#1A1423');
+        document.body.style.setProperty('--systemTitleBackground', '#3D314A');
+        document.body.style.setProperty('--systemTitleColor', 'white');
+      },
+      changeToTheme4: function(){
+        document.body.style.setProperty('--mainBackground', '#DCDCDC');
+        document.body.style.setProperty('--header', '#999999');
+        document.body.style.setProperty('--systemTitleBackground', '#B9B9B9');
+        document.body.style.setProperty('--systemTitleColor', 'black');
+      },
+    },
+
+    watch:{
+      titleTransaction: function(){
+        if(this.titleTransaction.length > 25){
+            this.titleTransaction = this.lastTitleTransactionValid;
+            this.titleTransactionError = true;
+        }else{
+          this.lastTitleTransactionValid = this.titleTransaction;
+        }
+      },
+      totalTransactionAmount: function(){
+        this.totalTransactionAmount = this.totalTransactionAmount.replace(/[^0-9,.]/g, '');
+      },
+      savedAmount: function(){
+        this.savedAmount = this.savedAmount.replace(/[^0-9,.]/g, '');
+
+        if(parseFloat(this.savedAmount) > parseFloat(this.totalTransactionAmount) || !this.totalTransactionAmount){
+          this.savedAmount = this.lastSavedAmountValid;
+          this.savedAmountError = true;
+        }else{
+          this.lastSavedAmountValid = this.savedAmount;
+        }
+      }
+    },
+
+    mounted: function(){
+      let theme = 'default';
+      switch(theme){
+        case 'default':
+          this.changeToDefaultTheme();
+          break;
+        case 'theme1':
+          this.changeToTheme1();
+          break;
+        case 'theme2':
+          this.changeToTheme2();
+          break;
+        case 'theme3':
+          this.changeToTheme3();
+          break;
+        case 'theme4':
+          this.changeToTheme4();
+          break;
+      }
+    }
+  }
+</script>
 
 <style scoped>
   .screen{
@@ -330,6 +547,18 @@
     display: flex;
     align-items: center;
   }
+  .select{
+    width: 13px;
+    height: 13px;
+    margin-right: 5px;
+    border: 1px solid rgb(163, 163, 163);
+    background: rgb(223, 223, 223);
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .selected{
+    background: rgb(255, 145, 0);
+  }
   .boxFieldNewTransaction{
     width: 100%;
     display: flex;
@@ -435,222 +664,3 @@
     .infoFinanceSingle--value{font-size: 12px;}
   }
 </style>
-
-
-<script>
-export default {
-  name: 'IndexPage',
-  head: {
-    title: 'Home',
-    meta: [
-      { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      {
-        hid: 'description',
-        name: 'description',
-        content: 'Gerencie seu dinheiro com muito mais facilidade e de forma 100% gratuita. Registre todas as entradas e saidas e tenha um melhor controle da sua vida financeira.'
-      }
-    ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
-  },
-  data: () =>{
-    return {
-      /*System Datas*/
-      isLogged: false,
-      loggedUser: [],
-      theme: '#111319',
-      
-      /*New Transaction Datas*/
-      transictionSelected: -1,
-      transactions: [
-        {id: 1, title: 'Site MaxCorres', date: '25/12/2025', totalValue: 2500.10, netValue: 2000.08, savedValue: 500.02},
-        {id: 2, title: 'X-box One', date: '25/12/2025', takenFrom: 'Disponivel', totalValue: -1000.00},
-        {id: 3, title: 'Site advogado teteu', date: '25/12/2025', totalValue: 500.00, netValue: 300.00, savedValue: 200.00},
-        {id: 4, title: 'torradeira plut', date: '25/12/2025', takenFrom: 'Emergêncial', totalValue: -500.00},
-        {id: 5, title: 'ganhei da Be', date: '25/12/2025', totalValue: 800.00, netValue: 800.00, savedValue: 0.00}
-      ],
-      selectedTransaction: 'deposit',
-      showBoxNewTransaction: false,
-
-      /*New Transaction Fields*/
-      titleTransaction: '',
-      lastTitleTransactionValid: '',
-      titleTransactionError: false,
-      totalTransactionAmount: '',
-      savedAmount: '',
-      savedAmountError: false,
-      lastSavedAmountValid: '',
-      takenFrom: '',
-      date: ''
-    };
-  },
-
-  methods:{
-    moreTransactionInfo: function(idToOpen){
-      let allBoxMoreInfo = document.querySelectorAll('.moreTransactionInfo');
-      let arrows = document.querySelectorAll('.arrow');
-      
-      for(let i = 0; i < allBoxMoreInfo.length; i++){
-        allBoxMoreInfo[i].style.display = 'none';
-        arrows[i].innerHTML = '';
-        arrows[i].innerHTML = '<i class="fas fa-chevron-left"></i>'
-      }
-
-      if(this.transictionSelected == idToOpen){
-        this.transictionSelected = NaN;
-      }else{
-        allBoxMoreInfo[idToOpen].style.display = 'block';
-        arrows[idToOpen].innerHTML = '<i class="fas fa-chevron-down"></i>';
-        this.transictionSelected = idToOpen;
-      }
-    },
-    deleteTransaction: function(idTransaction, index){
-
-      if(!confirm('Tem certeza que deseja apagar essa transição?')){
-        return false;
-      }
-
-      //deleta no banco de dados a transição id: idTransaction
-      //faça uma nova requisição para saber os novos valores da informações principais lá dos blocos
-      this.transactions.splice(index, 1);
-    },
-    selectAnAction: function(action){
-      this.selectedTransaction = action;
-      this.savedAmountError = false;
-    },
-    toggleBoxNewTransaction: function(){
-      this.showBoxNewTransaction = !this.showBoxNewTransaction;
-      this.savedAmountError = false;
-    },
-    confirmTransaction: function(){
-
-      if(!this.fieldsValidate()){
-        alert('Por favor, preencha todos os campos');
-        return false;
-      }
-
-      this.formatValueToReal();
-
-      /*Get ID to add a new transaction*/
-      let id = (this.transactions == 0) ? 0 : this.transactions.length + 1; 
-
-      switch(this.selectedTransaction){
-        case 'deposit':
-          this.transactions.push({id: id, title: this.titleTransaction, date: this.date, totalValue: parseFloat(this.totalTransactionAmount), netValue: (parseFloat(this.totalTransactionAmount) - parseFloat(this.savedAmount)), savedValue: parseFloat(this.savedAmount)})
-          break;
-        case 'toWithdraw':
-          this.transactions.push({id: id, title: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, totalValue: (~parseFloat(this.totalTransactionAmount) + 1)});
-          break;
-      }
-
-      //faça o envio ao BD Aqui
-      
-      this.resetTransactionsFields();
-    },
-    fieldsValidate: function(){
-      if(!this.titleTransaction || !this.totalTransactionAmount || !this.date)
-        return false;
-
-      if(!this.takenFrom && (this.selectedTransaction == 'toWithdraw'))
-        return false;
-
-      return true;
-    },
-    formatValueToReal: function(){
-      if(this.selectedTransaction == 'deposit'){
-          (this.savedAmount) ? '' : this.savedAmount = '0,00';
-          this.savedAmount = this.savedAmount.replace('.', '');
-          this.savedAmount = this.savedAmount.replace(',', '.');
-      }
-      this.totalTransactionAmount = this.totalTransactionAmount.replace('.', '');
-      this.totalTransactionAmount = this.totalTransactionAmount.replace(',', '.');
-    },
-    resetTransactionsFields: function(){
-      this.showBoxNewTransaction = false;
-      this.titleTransaction = '',
-      this.lastTitleTransactionValid = '',
-      this.titleTransactionError = false,
-      this.totalTransactionAmount = '',
-      this.savedAmount = '',
-      this.savedAmountError = false,
-      this.lastSavedAmountValid = '',
-      this.takenFrom = '',
-      this.date = ''
-    },
-    changeToDefaultTheme: function(){
-      document.body.style.setProperty('--mainBackground', '#C9C9C9');
-      document.body.style.setProperty('--header', '#111319');
-      document.body.style.setProperty('--systemTitleBackground', '#171A21');
-      document.body.style.setProperty('--systemTitleColor', 'white');
-    },
-    changeToTheme1: function(){
-      document.body.style.setProperty('--mainBackground', '#F3D2FF');
-      document.body.style.setProperty('--header', '#AC348B');
-      document.body.style.setProperty('--systemTitleBackground', '#D26AD4');
-      document.body.style.setProperty('--systemTitleColor', 'white');
-    },
-    changeToTheme2: function(){
-      document.body.style.setProperty('--mainBackground', '#171A21');
-      document.body.style.setProperty('--header', '#0B0B0B');
-      document.body.style.setProperty('--systemTitleBackground', '#0F0F0F');
-      document.body.style.setProperty('--systemTitleColor', 'white');
-    },
-    changeToTheme3: function(){
-      document.body.style.setProperty('--mainBackground', '#DEDEDE');
-      document.body.style.setProperty('--header', '#1A1423');
-      document.body.style.setProperty('--systemTitleBackground', '#3D314A');
-      document.body.style.setProperty('--systemTitleColor', 'white');
-    },
-    changeToTheme4: function(){
-      document.body.style.setProperty('--mainBackground', '#DCDCDC');
-      document.body.style.setProperty('--header', '#999999');
-      document.body.style.setProperty('--systemTitleBackground', '#B9B9B9');
-      document.body.style.setProperty('--systemTitleColor', 'black');
-    },
-  },
-
-  watch:{
-    titleTransaction: function(){
-      if(this.titleTransaction.length > 25){
-          this.titleTransaction = this.lastTitleTransactionValid;
-          this.titleTransactionError = true;
-      }else{
-        this.lastTitleTransactionValid = this.titleTransaction;
-      }
-    },
-    totalTransactionAmount: function(){
-      this.totalTransactionAmount = this.totalTransactionAmount.replace(/[^0-9,.]/g, '');
-    },
-    savedAmount: function(){
-      this.savedAmount = this.savedAmount.replace(/[^0-9,.]/g, '');
-
-      if(parseFloat(this.savedAmount) > parseFloat(this.totalTransactionAmount) || !this.totalTransactionAmount){
-        this.savedAmount = this.lastSavedAmountValid;
-        this.savedAmountError = true;
-      }else{
-        this.lastSavedAmountValid = this.savedAmount;
-      }
-    }
-  },
-  mounted: function(){
-    let theme = 'default';
-    switch(theme){
-      case 'default':
-        this.changeToDefaultTheme();
-        break;
-      case 'theme1':
-        this.changeToTheme1();
-        break;
-      case 'theme2':
-        this.changeToTheme2();
-        break;
-      case 'theme3':
-        this.changeToTheme3();
-        break;
-      case 'theme4':
-        this.changeToTheme4();
-        break;
-    }
-  }
-}
-</script>

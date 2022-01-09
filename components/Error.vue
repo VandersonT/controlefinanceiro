@@ -1,31 +1,31 @@
 <template>
-    <p class="warning">
-        <i class="fas fa-exclamation-triangle"></i>
+    <p class="error">
+        <i class="fas fa-exclamation-circle"></i>
         {{msg}}
     </p>
 </template>
 
 <style scoped>
-    .warning{
+    .error{
         width: 100%;
-        background: rgb(5, 130, 233);
+        background: rgb(160, 15, 10);
         color: rgb(233, 233, 233);
         padding: 5px;
         text-align: center;
         border-radius: 2px;
         font-size: 15px;
     }
-    .warning i{
-        color: rgb(212, 199, 18);
+    .error i{
+        color: rgb(255, 255, 255);
         font-size: 12px;
     }
 
     @media screen and (max-width: 930px){
-        .warning{font-size: 14px;}
-        .warning i{font-size: 12px;}
+        .error{font-size: 14px;}
+        .error i{font-size: 12px;}
     }
     @media screen and (max-width: 680px){
-        .warning{font-size: 12px;}
+        .error{font-size: 12px;}
     }
 </style>
 

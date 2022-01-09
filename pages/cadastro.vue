@@ -1,25 +1,17 @@
 <template>
     <main>
         <section class="boxLogin">
-            <h1>Login</h1>
+            <h1>Cadastre-se</h1>
+            <input type="text" placeholder="Digite o seu nome"/>
             <input type="text" placeholder="Digite o seu email"/>
             <input type="password" placeholder="Digite a sua senha"/>
+            <input type="password" placeholder="Confirme sua senha"/>
             <div class="keepConnected">
                 <input type="checkbox" />
-                Manter conectado
+                Mostrar Senha
             </div>
-            <button class="loginButton">Entrar</button>
-            <p class="link">Não possui uma conta? Cadastre-se</p>
-        </section>
-        <section class="alternateLogin">
-            <div class="alternateLogin__logo">
-                <img src="images/googleIcon.png" />
-                <p>Google</p>
-            </div>
-            <div class="alternateLogin__logo">
-                <img src="images/facebookIcon.png" />
-                <p>Google</p>
-            </div>
+            <button class="loginButton">Cadastrar</button>
+            <p class="link">Já possui uma conta? Faça login</p>
         </section>
     </main>
 </template>
@@ -28,7 +20,7 @@
     export default{
         head: {
             name: 'IndexPage',
-            title: 'Login',
+            title: 'Cadastro',
             meta: [
             { charset: 'utf-8' },
             { name: 'viewport', content: 'width=device-width, initial-scale=1' },

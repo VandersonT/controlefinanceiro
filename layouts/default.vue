@@ -80,20 +80,16 @@
       background: rgb(156, 10, 10) !important;
       color: rgb(230, 230, 230) !important;
     }
-  /*------------------------------------*/
 
-  /*----------Custom Radio Input--------*/
-    .select{
-      width: 13px;
-      height: 13px;
-      margin-right: 5px;
-      border: 1px solid rgb(163, 163, 163);
-      background: rgb(223, 223, 223);
-      border-radius: 10px;
-      cursor: pointer;
+    /*Button Update*/
+    .button--update{
+      border: 2px solid transparent !important;
+      background: #02a1fd !important;
+      color: white !important;
     }
-    .selected{
-      background: rgb(255, 145, 0);
+    .button--update:hover{
+      background: #009af3 !important;
+      color: rgb(243, 243, 243) !important;
     }
   /*------------------------------------*/
 </style>
