@@ -138,15 +138,8 @@
 
 <script>
   import Cookies from 'js-cookie'
-
+  
   export default {
-    beforeMount: function(){
-      
-      if(Cookies.get('token')){
-        this.isLogged = true;
-      }
-      
-    },
     name: 'IndexPage',
     head: {
       title: 'Home',
@@ -194,6 +187,11 @@
 
     methods:{
       moreTransactionInfo: function(idToOpen){
+        
+        if(this.isLogged){
+          alert('logado');
+        }
+        return 
         let allBoxMoreInfo = document.querySelectorAll('.moreTransactionInfo');
         let arrows = document.querySelectorAll('.arrow');
         
@@ -314,6 +312,14 @@
         document.body.style.setProperty('--systemTitleBackground', '#B9B9B9');
         document.body.style.setProperty('--systemTitleColor', 'black');
       },
+      async teste(){
+        this.isLogged = true;
+
+        let response = await this.$axios.$post('http://127.0.0.1:8000/api/auth',{
+            token: Cookies.get('token'),
+        });
+        this.loggedUser = response.loggedUser;
+      }
     },
 
     watch:{
@@ -339,7 +345,7 @@
         }
       }
     },
-
+    
     mounted: function(){
       let theme = 'default';
       switch(theme){
@@ -359,6 +365,11 @@
           this.changeToTheme4();
           break;
       }
+      
+      if(Cookies.get('token')){
+        this.teste()
+      }
+
     }
   }
 </script>

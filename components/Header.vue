@@ -2,25 +2,25 @@
     <header>
         <section class="welcomeUser">
             <img :src="(isLogged) ? loggedUser['avatar'] : 'images/no-picture.png' " alt="imagem de perfil" />
-            <p>Olá, {{isLogged ? 'Nome Usuário' : 'Desconhecido'}}, tudo bom? <i class="far fa-smile-beam"></i></p>
+            <p>Olá, {{isLogged ? loggedUser['name'] : 'Desconhecido'}}, tudo bom? <i class="far fa-smile-beam"></i></p>
         </section>
 
         <section class="menuDesktop">
             <div v-if="isLogged" class="menuButton">
-            <button>Meu Perfil</button>
-            <button class="button__close">Sair</button>
+                <button class="headerButton">Meu Perfil</button>
+                <button class="headerButton button__close">Sair</button>
             </div>
             <div v-else class="menuButton">
-            <button>Login</button>
-            <button>Cadastrar</button>
+                <button class="headerButton">Login</button>
+                <button class="headerButton">Cadastrar</button>
             </div>
         </section>
 
         <section class="boxMenuMobile">
             <button @click="activeMobileMenu()" class="btnOpenMenuMobile"><i class="fas fa-bars"></i></button>
             <div class="menuMobile" v-if="mobileMenuIsActive">
-            <button>Login</button>
-            <button>Cadastrar</button>
+                <button class="headerButton">Login</button>
+                <button class="headerButton">Cadastrar</button>
             </div>
         </section>
     </header>
@@ -50,14 +50,14 @@
         border-radius: 50px;
         margin-right: 10px;
     }
-    .menuButton button{
+    .menuButton .headerButton{
         background: rgb(228, 222, 212);
         color: black;
         margin: 5px;
         padding: 5px 10px;
         border-radius: 3px;
     }
-    .menuButton button:active{
+    .menuButton .headerButton:active{
         background: rgb(207, 201, 192);
     }
 
@@ -75,16 +75,16 @@
         border-radius: 3px;
         border: 1px solid gray;
     }
-    .menuMobile button{
+    .menuMobile .headerButton{
         padding: 10px 25px;
         border-radius: 5px;
         border: rgb(26, 26, 26) 1px solid;
         color: rgb(26, 26, 26);
     }
-    .menuMobile button:nth-child(1){
+    .menuMobile .headerButton:nth-child(1){
         margin-bottom: 10px;
     }
-    .menuMobile button:active{
+    .menuMobile .headerButton:active{
         background: rgb(219, 219, 219);
     }
 

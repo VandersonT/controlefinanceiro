@@ -72,7 +72,7 @@
                     this.errorMessage = response['error'];
                     return false;
                 }
-
+                
                 Cookies.set('token', response['token'])
                 this.$router.push('/')
             },
