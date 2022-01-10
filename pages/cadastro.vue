@@ -11,7 +11,7 @@
                 Mostrar Senha
             </div>
             <button class="loginButton">Cadastrar</button>
-            <p class="link">Já possui uma conta? Faça login</p>
+            <nuxt-link to="/login" class="link">Já possui uma conta? Faça login</nuxt-link>
         </section>
     </main>
 </template>

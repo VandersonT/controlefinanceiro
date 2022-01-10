@@ -5,9 +5,7 @@
             <p>Olá, {{isLogged ? loggedUser['name'] : 'Desconhecido'}}, tudo bom? <i class="far fa-smile-beam"></i></p>
         </section>
 
-        <p v-show="loading">Carregando...</p>
-
-        <section class="menuDesktop">
+        <section class="menuDesktop" v-show="!loading">
             <div v-if="isLogged" class="menuButton">
                 <nuxt-link to="/perfil" class="headerButton">Meu Perfil</nuxt-link>
                 <button @click="logOut()" class="headerButton button__close">Sair</button>
@@ -18,7 +16,7 @@
             </div>
         </section>
 
-        <section class="boxMenuMobile">
+        <section class="boxMenuMobile" v-show="!loading">
             <button @click="activeMobileMenu()" class="btnOpenMenuMobile"><i class="fas fa-bars"></i></button>
             <div class="menuMobile" v-if="mobileMenuIsActive && !isLogged">
                 <nuxt-link to="/login" class="headerButton">Login</nuxt-link>
@@ -30,6 +28,8 @@
             </div>
             
         </section>
+
+        <p class="loading" v-show="loading">Carregando...</p>
     </header>
 </template>
 
@@ -121,7 +121,10 @@
     .menuMobile .headerButton:active{
         background: rgb(219, 219, 219);
     }
-
+    .loading{
+        width: 100%;
+        text-align: center;
+    }
     /*RESPONSIVE*/
     @media screen and (max-width: 830px){
         .menuDesktop{display: none;}

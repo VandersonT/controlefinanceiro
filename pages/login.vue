@@ -9,7 +9,7 @@
             <input v-model="email" type="text" placeholder="Digite o seu email"/>
             <input v-model="password" type="password" placeholder="Digite a sua senha"/>
             <div class="keepConnected">
-                <input type="checkbox" />
+                <input v-model="keepConnected" type="checkbox" />
                 Manter conectado
             </div>
             <button @click="loginAction" class="loginButton">Entrar</button>
@@ -73,7 +73,7 @@
                     return false;
                 }
                 
-                Cookies.set('token', response['token'])
+                (this.keepConnected) ? Cookies.set('token', response['token'], {expires: 365}) : Cookies.set('token', response['token']);
                 this.$router.push('/')
             },
             checkLogin: function(){
