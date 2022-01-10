@@ -1,16 +1,21 @@
 <template>
     <main>
+
         <section class="boxLogin">
             <h1>Login</h1>
-            <input type="text" placeholder="Digite o seu email"/>
-            <input type="password" placeholder="Digite a sua senha"/>
+
+            <error class="animate__animated animate__flash errorCustom" v-if="errorLogin" :msg="errorMessage" />
+            
+            <input v-model="email" type="text" placeholder="Digite o seu email"/>
+            <input v-model="password" type="password" placeholder="Digite a sua senha"/>
             <div class="keepConnected">
                 <input type="checkbox" />
                 Manter conectado
             </div>
-            <button class="loginButton">Entrar</button>
-            <p class="link">Não possui uma conta? Cadastre-se</p>
+            <button @click="loginAction" class="loginButton">Entrar</button>
+            <nuxt-link to="/cadastro" class="link">Não possui uma conta? Cadastre-se</nuxt-link>
         </section>
+
         <section class="alternateLogin">
             <div class="alternateLogin__logo">
                 <img src="images/googleIcon.png" />
@@ -21,11 +26,16 @@
                 <p>Google</p>
             </div>
         </section>
+
     </main>
 </template>
 
 <script>
+    import Cookies from 'js-cookie'
     export default{
+        beforeMount: function(){
+            (Cookies.get('token')) ? this.$router.push('/') : '';
+        },
         head: {
             name: 'IndexPage',
             title: 'Login',
@@ -40,6 +50,50 @@
             ],
             link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
         },
+        data: () => {
+            return {
+                email: '',
+                password: '',
+                keepConnected: false,
+                errorLogin: false,
+                errorMessage: '',
+            }
+        },
+        methods:{
+            async loginAction() {
+
+                let response = await this.$axios.$post('http://127.0.0.1:8000/api/login',{
+                    email: this.email,
+                    pass: this.password
+                });
+                
+                if(response['error'] != ''){
+                    this.errorLogin = true;
+                    this.errorMessage = response['error'];
+                    return false;
+                }
+
+                Cookies.set('token', response['token'])
+                this.$router.push('/')
+            },
+            checkLogin: function(){
+                if(!this.email || !this.password){  
+                    this.errorLogin = true;
+                    this.errorMessage = 'Por favor, preencha todos os campos.';
+                    return false;
+                }
+
+                let user = this.email.substring(0, this.email.indexOf("@"));
+                let dominio = this.email.substring(this.email.indexOf("@")+ 1, this.email.length);
+
+                if (!((user.length >=1) && (dominio.length >=3) && (user.search("@")==-1) && (dominio.search("@")==-1) && (usuario.search(" ")==-1) && (dominio.search(" ")==-1) && (dominio.search(".")!=-1) && (dominio.indexOf(".") >=1) && (dominio.lastIndexOf(".") < dominio.length - 1))){
+                    this.errorLogin = true;
+                    this.errorMessage = 'O email digitado não é válido.';
+                    return false;
+                }
+                return true;
+            }
+        }
     }
 </script>
 
@@ -54,6 +108,9 @@
         align-items: center;
         flex-direction: column;
         background: #C5C5C5;
+    }
+    .errorCustom{
+        width: 90% !important;
     }
     .boxLogin{
         width: 400px;

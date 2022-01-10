@@ -137,7 +137,16 @@
 </template>
 
 <script>
+  import Cookies from 'js-cookie'
+
   export default {
+    beforeMount: function(){
+      
+      if(Cookies.get('token')){
+        this.isLogged = true;
+      }
+      
+    },
     name: 'IndexPage',
     head: {
       title: 'Home',

@@ -8,16 +8,20 @@
 <style scoped>
     .error{
         width: 100%;
-        background: rgb(160, 15, 10);
+        background: rgb(185, 17, 11);
         color: rgb(233, 233, 233);
         padding: 5px;
-        text-align: center;
         border-radius: 2px;
         font-size: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
     }
     .error i{
         color: rgb(255, 255, 255);
         font-size: 12px;
+        padding-right: 5px;
     }
 
     @media screen and (max-width: 930px){
