@@ -1,30 +1,63 @@
 <template>
     <header>
-        <section class="welcomeUser">
+        <section class="welcomeUser" v-show="!loading">
             <img :src="(isLogged) ? loggedUser['avatar'] : 'images/no-picture.png' " alt="imagem de perfil" />
             <p>Olá, {{isLogged ? loggedUser['name'] : 'Desconhecido'}}, tudo bom? <i class="far fa-smile-beam"></i></p>
         </section>
 
+        <p v-show="loading">Carregando...</p>
+
         <section class="menuDesktop">
             <div v-if="isLogged" class="menuButton">
-                <button class="headerButton">Meu Perfil</button>
-                <button class="headerButton button__close">Sair</button>
+                <nuxt-link to="/perfil" class="headerButton">Meu Perfil</nuxt-link>
+                <button @click="logOut()" class="headerButton button__close">Sair</button>
             </div>
             <div v-else class="menuButton">
-                <button class="headerButton">Login</button>
-                <button class="headerButton">Cadastrar</button>
+                <nuxt-link to="/login" class="headerButton">Login</nuxt-link>
+                <nuxt-link to="/cadastro" class="headerButton">Cadastrar</nuxt-link>
             </div>
         </section>
 
         <section class="boxMenuMobile">
             <button @click="activeMobileMenu()" class="btnOpenMenuMobile"><i class="fas fa-bars"></i></button>
-            <div class="menuMobile" v-if="mobileMenuIsActive">
-                <button class="headerButton">Login</button>
-                <button class="headerButton">Cadastrar</button>
+            <div class="menuMobile" v-if="mobileMenuIsActive && !isLogged">
+                <nuxt-link to="/login" class="headerButton">Login</nuxt-link>
+                <nuxt-link to="/cadastro" class="headerButton">Cadastrar</nuxt-link>
             </div>
+            <div class="menuMobile" v-if="mobileMenuIsActive && isLogged">
+                <nuxt-link to="/perfil" class="headerButton">Meu Perfil</nuxt-link>
+                <button @click="logOut()" class="headerButton button__close">Sair</button>
+            </div>
+            
         </section>
     </header>
 </template>
+
+
+<script>
+    import Cookies from 'js-cookie'
+    export default {
+        props: ['loggedUser', 'isLogged', 'loading'],
+        data:()=>{
+            return {
+                mobileMenuIsActive: false
+            }
+        },
+        methods:{
+            activeMobileMenu: function(){
+                this.mobileMenuIsActive = !this.mobileMenuIsActive;
+            },
+            logOut: function(){
+
+                if(!confirm("Você deseja realmente sair da sua conta?"))
+                    return false;
+
+                Cookies.remove('token');
+                this.$router.push('/login')
+            }
+        },
+    }
+</script>
 
 <style scoped>
     /*-------HEADER-------*/
@@ -56,6 +89,7 @@
         margin: 5px;
         padding: 5px 10px;
         border-radius: 3px;
+        text-decoration: none;
     }
     .menuButton .headerButton:active{
         background: rgb(207, 201, 192);
@@ -103,19 +137,3 @@
         }
     }
 </style>
-
-<script>
-    export default {
-        props: ['loggedUser', 'isLogged'],
-        data:()=>{
-            return {
-                mobileMenuIsActive: false,
-            }
-        },
-        methods:{
-            activeMobileMenu: function(){
-                this.mobileMenuIsActive = !this.mobileMenuIsActive;
-            }
-        },
-    }
-</script>

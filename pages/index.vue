@@ -1,8 +1,7 @@
 <template>
     <div class="screen">
       
-      <Header :loggedUser="loggedUser" :isLogged="isLogged"/>
-
+      <Header :loggedUser="loggedUser" :isLogged="isLogged" :loading="loading"/>
       <main>
         <!--Floating Section with available and emergency value-->
         <section class="boxFinanceInfo">
@@ -159,6 +158,7 @@
         /*System Datas*/
         isLogged: false,
         loggedUser: [],
+        loading: true,
 
         /*New Transaction Datas*/
         transictionSelected: -1,
@@ -312,13 +312,14 @@
         document.body.style.setProperty('--systemTitleBackground', '#B9B9B9');
         document.body.style.setProperty('--systemTitleColor', 'black');
       },
-      async teste(){
+      async getLoggedUser(token){
         this.isLogged = true;
 
         let response = await this.$axios.$post('http://127.0.0.1:8000/api/auth',{
-            token: Cookies.get('token'),
+            token: token,
         });
         this.loggedUser = response.loggedUser;
+        this.loading = false;
       }
     },
 
@@ -367,7 +368,9 @@
       }
       
       if(Cookies.get('token')){
-        this.teste()
+        this.getLoggedUser(Cookies.get('token'))
+      }else{
+        this.loading = false;
       }
 
     }
