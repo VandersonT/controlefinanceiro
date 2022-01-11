@@ -1,23 +1,30 @@
 <template>
     <main>
-        <section class="boxLogin">
+        <section class="boxRegister">
             <h1>Cadastre-se</h1>
-            <input type="text" placeholder="Digite o seu nome"/>
-            <input type="text" placeholder="Digite o seu email"/>
-            <input type="password" placeholder="Digite a sua senha"/>
-            <input type="password" placeholder="Confirme sua senha"/>
-            <div class="keepConnected">
-                <input type="checkbox" />
+
+            <error class="animate__animated animate__flash errorCustom" v-if="errorRegister" :msg="errorMessage" />
+
+            <input v-model="name" type="text" placeholder="Digite o seu nome"/>
+            <input v-model="email" type="text" placeholder="Digite o seu email"/>
+            <input v-model="pass" :type="(showPass) ? 'text' : 'password'" placeholder="Digite a sua senha"/>
+            <input v-model="confirmPass" :type="(showPass) ? 'text' : 'password'" placeholder="Confirme sua senha"/>
+            <div class="showPass">
+                <input @click="showPassAction()" type="checkbox" />
                 Mostrar Senha
             </div>
-            <button class="loginButton">Cadastrar</button>
+            <button @click="registerAction()" class="registerButton">Cadastrar</button>
             <nuxt-link to="/login" class="link">Já possui uma conta? Faça login</nuxt-link>
         </section>
     </main>
 </template>
 
 <script>
+    import Cookies from 'js-cookie'
     export default{
+        beforeMount: function(){
+            (Cookies.get('token')) ? this.$router.push('/') : '';
+        },
         head: {
             name: 'IndexPage',
             title: 'Cadastro',
@@ -32,6 +39,67 @@
             ],
             link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
         },
+        data:()=>{
+            return{
+                name: '',
+                email: '',
+                pass: '',
+                confirmPass: '',
+                errorRegister: '',
+                errorMessage: '',
+                showPass: false
+            }
+        },
+        methods:{
+            async registerAction(){
+                
+                if(!this.fieldsValidate())
+                    return false;
+
+                let response = await this.$axios.$post('http://127.0.0.1:8000/api/newUser',{
+                    name: this.name,
+                    email: this.email,
+                    pass: this.pass,
+                    confirmPass: this.confirmPass,
+                });
+                
+                if(response['error'] != ''){
+                    this.errorRegister = true;
+                    this.errorMessage = response['error'];
+                    return false;
+                }
+
+                Cookies.set('token', response['token'])
+                this.$router.push('/')
+            },
+            fieldsValidate(){
+                if(!this.email && !this.name && !this.pass && !this.confirmPass){
+                    this.errorRegister = true;
+                    this.errorMessage = 'Por favor, preencha todos os campos.';
+                    return false;
+                }
+
+                let user = this.email.substring(0, this.email.indexOf("@"));
+                let dominio = this.email.substring(this.email.indexOf("@")+ 1, this.email.length);
+
+                if (!((user.length >=1) && (dominio.length >=3) && (user.search("@")==-1) && (dominio.search("@")==-1) && (user.search(" ")==-1) && (dominio.search(" ")==-1) && (dominio.search(".")!=-1) && (dominio.indexOf(".") >=1) && (dominio.lastIndexOf(".") < dominio.length - 1))){
+                    this.errorRegister = true;
+                    this.errorMessage = 'O email digitado não é válido.';
+                    return false;
+                }
+
+                if(this.pass != this.confirmPass){
+                    this.errorRegister = true;
+                    this.errorMessage = 'A senha e a confirmação não coincidem';
+                    return false;
+                }
+
+                return true;
+            },
+            showPassAction: function(){
+                this.showPass = !this.showPass;
+            }
+        }
     }
 </script>
 
@@ -47,7 +115,7 @@
         flex-direction: column;
         background: #C5C5C5;
     }
-    .boxLogin{
+    .boxRegister{
         width: 400px;
         padding: 20px 10px;
         background: rgb(255, 255, 255);
@@ -62,12 +130,12 @@
         -webkit-box-shadow: 0px 0px 14px -5px rgba(0,0,0,0.73);
         -moz-box-shadow: 0px 0px 14px -5px rgba(0,0,0,0.73);
     }
-    .boxLogin h1{
+    .boxRegister h1{
         color: #D6850C;
         margin-bottom: 10px;
         font-size: 30px;
     }
-    .boxLogin input:not(input[type=checkbox]){
+    .boxRegister input:not(input[type=checkbox]){
         width: 90%;
         padding: 13px 10px;
         border: 1px solid gray;
@@ -75,16 +143,16 @@
         margin: 10px;
         outline: 0;
     }
-    .boxLogin input[type=checkbox]{
+    .boxRegister input[type=checkbox]{
         margin-right: 4px;
     }
-    .keepConnected{
+    .showPass{
         width: 90%;
         display: flex;
         align-items: center;
         margin-bottom: 10px;
     }
-    .loginButton{
+    .registerButton{
         margin: 10px;
         padding: 10px 30px;
         border-radius: 5px;
@@ -92,48 +160,15 @@
         color: white;
         font-family: sans-serif;
     }
-    .loginButton:active{
+    .registerButton:active{
         background: #f08400;
         color: rgb(236, 236, 236);
     }
 
-    .alternateLogin{
-        width: 400px;
-        border: 1px solid #999999;
-        background: rgb(226, 226, 226);
-        display: flex;
-        justify-content:center;
-        text-align: center;
-        box-shadow: 0px 0px 14px -5px rgba(0,0,0,0.73);
-        -webkit-box-shadow: 0px 0px 14px -5px rgba(0,0,0,0.73);
-        -moz-box-shadow: 0px 0px 14px -5px rgba(0,0,0,0.73);
-        cursor: pointer;
-    }
-    .alternateLogin__logo{
-        padding: 6px 25px;
-        margin: 0 5px;
-    }
-    .alternateLogin__logo:hover{
-        background: rgb(197, 197, 197);        
-    }
-    .alternateLogin img{
-        width: 45px;
-        height: 45px;
-    }
-    .alternateLogin p{
-        font-size: 14px;
-        color: #343434;
-        font-family: 'Roboto Condensed', sans-serif;
-    }
     /*RESPONSIVE*/
     @media screen and (max-width: 440px) {
-        .alternateLogin,
-        .boxLogin{
+        .boxRegister{
             width: 90%;
-        }
-        .alternateLogin img{
-            width: 40px;
-            height: 40px;
         }
     }
 </style>

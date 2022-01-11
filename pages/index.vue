@@ -88,10 +88,12 @@
             </article>
           </div>
 
-          <p class="empty" v-if="transactions < 1">
+          <p class="empty" v-if="transactions < 1 && !loadingTransactions">
             <i class="far fa-dizzy"></i>
             Você ainda não realizou nenhuma transação
           </p>
+
+          <p class="loadingTransactions" v-if="loadingTransactions">Carregando...</p>
 
         </section>
 
@@ -168,6 +170,7 @@
         loggedUser: [],
         loading: true,
         loadingTransactionInfo: true,
+        loadingTransactions: true,
 
         /*Transaction Datas*/
         netValueTotal: 0,
@@ -314,7 +317,6 @@
         document.body.style.setProperty('--systemTitleColor', 'black');
       },
       async getLoggedUserInfo(token){
-        this.isLogged = true;
 
         await this.$axios.$post('http://127.0.0.1:8000/api/auth',{
             token: token,
@@ -325,6 +327,9 @@
         .finally(()=>{
           this.loading = false;
           this.getUserTransactionsInfo();
+        })
+        .catch(()=>{
+          this.isLogged = false;
         });
         
       },
@@ -337,6 +342,9 @@
         .finally(()=>{
           this.loadingTransactionInfo = false;
           this.getUserTransactions()
+        })
+        .catch(()=>{
+          this.isLogged = false;
         });
       },
       async getUserTransactions(){
@@ -345,6 +353,12 @@
         .then(response=>{
           this.transactions = response.transactions.data;
         })
+        .finally(()=>{
+          this.loadingTransactions = false;
+        })
+        .catch(()=>{
+          this.isLogged = false;
+        });
       }
     },
 
@@ -371,7 +385,7 @@
         }
       }
     },
-    
+
     mounted: function(){
       let theme = 'default';
       switch(theme){
@@ -393,6 +407,7 @@
       }
       
       if(Cookies.get('token')){
+        this.isLogged = true;
         this.getLoggedUserInfo(Cookies.get('token'));
       }else{
         this.loading = false;
@@ -473,7 +488,7 @@
     font-size: 24px;
     font-family: 'Poppins', sans-serif;
   }
-
+  .loadingTransactions,
   .loadingTransactionInfo{
     text-align: center;
     margin-top: 10px;

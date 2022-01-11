@@ -61,6 +61,9 @@
         },
         methods:{
             async loginAction() {
+                
+                if(!this.checkLogin())
+                    return false;
 
                 let response = await this.$axios.$post('http://127.0.0.1:8000/api/login',{
                     email: this.email,
@@ -86,7 +89,7 @@
                 let user = this.email.substring(0, this.email.indexOf("@"));
                 let dominio = this.email.substring(this.email.indexOf("@")+ 1, this.email.length);
 
-                if (!((user.length >=1) && (dominio.length >=3) && (user.search("@")==-1) && (dominio.search("@")==-1) && (usuario.search(" ")==-1) && (dominio.search(" ")==-1) && (dominio.search(".")!=-1) && (dominio.indexOf(".") >=1) && (dominio.lastIndexOf(".") < dominio.length - 1))){
+                if (!((user.length >=1) && (dominio.length >=3) && (user.search("@")==-1) && (dominio.search("@")==-1) && (user.search(" ")==-1) && (dominio.search(" ")==-1) && (dominio.search(".")!=-1) && (dominio.indexOf(".") >=1) && (dominio.lastIndexOf(".") < dominio.length - 1))){
                     this.errorLogin = true;
                     this.errorMessage = 'O email digitado não é válido.';
                     return false;
