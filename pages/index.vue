@@ -125,8 +125,8 @@
             <div v-if="selectedTransaction == 'toWithdraw'" class="boxFieldNewTransaction">
               <p>De onde deseja retirar o dinheiro?</p>
               <select v-model="takenFrom">
-                <option selected>Valor Disponivel</option>
-                <option>Valor de Emergência</option>
+                <option selected value="Disponivel">Valor Disponivel</option>
+                <option value="Emergencial">Valor de Emergência</option>
               </select>
             </div>
 
@@ -240,8 +240,15 @@
 
         this.formatValueToReal();
 
+        if(this.isLogged){
+          if(!this.sendNewTransactionToDb())
+            return false;
+        }else{
+          //salva mo local storage
+        }
+
         /*Get ID to add a new transaction*/
-        let id = (this.transactions == 0) ? 0 : this.transactions.length + 1; 
+        let id = this.idGenerator();
 
         switch(this.selectedTransaction){
           case 'deposit':
@@ -251,10 +258,34 @@
             this.transactions.unshift({id: id, description: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, total: (~parseFloat(this.totalTransactionAmount) + 1)});
             break;
         }
-
-        //faça o envio ao BD Aqui
         
         this.resetTransactionsFields();
+      },
+      async sendNewTransactionToDb() {
+          let response = await this.$axios.$post('http://127.0.0.1:8000/api/newTransaction',{
+              userId: this.loggedUser['id'],
+              total: (this.selectedTransaction == 'deposit') ? parseInt(this.totalTransactionAmount) : (~parseFloat(this.totalTransactionAmount) + 1),
+              description: this.titleTransaction,
+              date: this.date,
+              takenFrom: this.takenFrom,
+              netValue: this.totalTransactionAmount - this.savedAmount,
+              savedValue: this.savedAmount
+          });
+
+          if(response['error'] != ''){
+              this.errorLogin = true;
+              this.errorMessage = response['error'];
+              return false;
+          }
+          return true;
+      },
+      idGenerator: function(){
+        let char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
+        for (let i = 0; i < 7; i++) {
+            randomString += char.charAt(Math.floor(Math.random() * char.length));
+        }
+        return randomString+Math.floor(Math.random() * 99 + 1)+Math.floor(Math.random() * 999 + 1)+Math.floor(Math.random() * 9999 + 1)
       },
       fieldsValidate: function(){
         if(!this.titleTransaction || !this.totalTransactionAmount || !this.date)
