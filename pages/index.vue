@@ -12,14 +12,16 @@
                   <span>Disponivel</span>
                   <i class="far fa-arrow-alt-circle-up up"></i>
                 </div>
-                <p class="infoFinanceSingle--value">R$ {{netValueTotal.toFixed(2).replace('.', ',')}}</p>
+                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">R$ {{netValueTotal.toFixed(2).replace('.', ',')}}</p>
+                <p v-if="loadingTransactionInfo" class="loadingTransactionInfo">Carregando...</p>
               </div>
               <div class="infoFinanceSingle infoFinanceSingle__blue">
                 <div class="infoFinanceSingle--title">
                   <span>Emergência</span>
                   <i class="fas fa-lock emergency"></i>
                 </div>
-                <p class="infoFinanceSingle--value">R$ {{savedValueTotal.toFixed(2).replace('.', ',')}}</p>
+                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">R$ {{savedValueTotal.toFixed(2).replace('.', ',')}}</p>
+                <p v-if="loadingTransactionInfo" class="loadingTransactionInfo">Carregando...</p>
               </div>
           </div>
         </section>
@@ -35,17 +37,17 @@
           
           <div class="transactionSingle" v-for="(transaction, index) in transactions" v-bind:key="transaction.id">
             <!--Positive Transaction structure-->
-            <article class="boxTransactionInfo" v-if="transaction['totalValue'] >= 0">
+            <article class="boxTransactionInfo" v-if="transaction['total'] >= 0">
               <div @click="moreTransactionInfo(index)" class="transactionInfo">
-                <p>{{transaction['title']}}</p>
+                <p>{{transaction['description']}}</p>
                 <div class="info2">
-                  <p class="positiveValue">R$ {{transaction['totalValue'].toFixed(2).replace(".", ",")}}</p>
+                  <p class="positiveValue">R$ {{transaction['total'].toFixed(2).replace(".", ",")}}</p>
                   <p  class="arrow"><i class="fas fa-chevron-left"></i></p>
                 </div>
               </div>
               <div class="moreTransactionInfo">
                 <div class="fieldTransaction">
-                  <p><b>Descrição:</b> {{transaction['title']}}</p>
+                  <p><b>Descrição:</b> {{transaction['description']}}</p>
                   <p><b>Valor Guardado:</b> R${{transaction['savedValue'].toFixed(2).replace(".", ",")}}</p>
                 </div>
                 <div class="fieldTransaction">
@@ -53,7 +55,7 @@
                   <p><b>Valor Liquido:</b> R${{transaction['netValue'].toFixed(2).replace(".", ",")}}</p>
                 </div>
                 <div class="fieldTransaction centerField">
-                  <p><b>Valor Total:</b> R${{transaction['totalValue'].toFixed(2).replace(".", ",")}}</p>
+                  <p><b>Valor Total:</b> R${{transaction['total'].toFixed(2).replace(".", ",")}}</p>
                 </div>
                 <div class="boxButtons">
                   <button @click="deleteTransaction(transaction['id'], index)"><i class="fas fa-trash-alt trashIcon"></i></button>
@@ -64,20 +66,20 @@
             <!--Negative Transaction structure-->
             <article class="boxTransactionInfo" v-else>
               <div @click="moreTransactionInfo(index)" class="transactionInfo">
-                <p>{{transaction['title']}}</p>
+                <p>{{transaction['description']}}</p>
                 <div class="info2">
-                  <p class="negativeValue">R$ {{transaction['totalValue'].toFixed(2).replace(".", ",")}}</p>
+                  <p class="negativeValue">R$ {{transaction['total'].toFixed(2).replace(".", ",")}}</p>
                   <p class="arrow"><i class="fas fa-chevron-left"></i></p>
                 </div>
               </div>
               <div class="moreTransactionInfo">
                 <div class="fieldTransaction">
-                  <p><b>Descrição:</b> {{transaction['title']}}</p>
+                  <p><b>Descrição:</b> {{transaction['description']}}</p>
                   <p><b>Data:</b> {{transaction['date']}}</p>
                 </div>
                 <div class="fieldTransaction">
                   <p><b>Retirado do valor:</b> {{transaction['takenFrom']}}</p>
-                  <p><b>Valor Retirado:</b> R${{transaction['totalValue']}}</p>
+                  <p><b>Valor Retirado:</b> R${{transaction['total']}}</p>
                 </div>
                 <div class="boxButtons">
                   <button @click="deleteTransaction(transaction['id'], index)"><i class="fas fa-trash-alt trashIcon"></i></button>
@@ -165,6 +167,7 @@
         isLogged: false,
         loggedUser: [],
         loading: true,
+        loadingTransactionInfo: true,
 
         /*Transaction Datas*/
         netValueTotal: 0,
@@ -239,10 +242,10 @@
 
         switch(this.selectedTransaction){
           case 'deposit':
-            this.transactions.push({id: id, title: this.titleTransaction, date: this.date, totalValue: parseFloat(this.totalTransactionAmount), netValue: (parseFloat(this.totalTransactionAmount) - parseFloat(this.savedAmount)), savedValue: parseFloat(this.savedAmount)})
+            this.transactions.unshift({id: id, description: this.titleTransaction, date: this.date, total: parseFloat(this.totalTransactionAmount), netValue: (parseFloat(this.totalTransactionAmount) - parseFloat(this.savedAmount)), savedValue: parseFloat(this.savedAmount)})
             break;
           case 'toWithdraw':
-            this.transactions.push({id: id, title: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, totalValue: (~parseFloat(this.totalTransactionAmount) + 1)});
+            this.transactions.unshift({id: id, description: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, total: (~parseFloat(this.totalTransactionAmount) + 1)});
             break;
         }
 
@@ -310,7 +313,7 @@
         document.body.style.setProperty('--systemTitleBackground', '#B9B9B9');
         document.body.style.setProperty('--systemTitleColor', 'black');
       },
-      async getLoggedUser(token){
+      async getLoggedUserInfo(token){
         this.isLogged = true;
 
         await this.$axios.$post('http://127.0.0.1:8000/api/auth',{
@@ -318,20 +321,30 @@
         })
         .then(response=>{
           this.loggedUser = response.loggedUser;
-          this.loading = false;
         })
         .finally(()=>{
-          this.getUserTransactions();
+          this.loading = false;
+          this.getUserTransactionsInfo();
         });
         
+      },
+      async getUserTransactionsInfo(){
+        await this.$axios.$get('http://127.0.0.1:8000/api/getUserFinancialInfo/'+this.loggedUser['id'])
+        .then(response=>{
+          this.savedValueTotal = response['saveValueTotal'];
+          this.netValueTotal = response['netValueTotal'];
+        })
+        .finally(()=>{
+          this.loadingTransactionInfo = false;
+          this.getUserTransactions()
+        });
       },
       async getUserTransactions(){
         let id = this.loggedUser['id'];
         await this.$axios.$get('http://127.0.0.1:8000/api/userTransactions/'+this.loggedUser['id'])
         .then(response=>{
-          this.savedValueTotal = response['saveValueTotal'];
-          this.netValueTotal = response['netValueTotal'];
-        });
+          this.transactions = response.transactions.data;
+        })
       }
     },
 
@@ -380,8 +393,7 @@
       }
       
       if(Cookies.get('token')){
-        this.getLoggedUser(Cookies.get('token'));
-        //this.getUserTransactions();
+        this.getLoggedUserInfo(Cookies.get('token'));
       }else{
         this.loading = false;
       }
@@ -460,6 +472,11 @@
     margin-top: 10px;
     font-size: 24px;
     font-family: 'Poppins', sans-serif;
+  }
+
+  .loadingTransactionInfo{
+    text-align: center;
+    margin-top: 10px;
   }
   .infoFinanceSingle__blue{
     background: #056be0;
