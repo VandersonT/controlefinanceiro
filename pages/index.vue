@@ -238,6 +238,9 @@
           return false;
         }
 
+        if(!this.checkPermitions())
+          return false;
+
         this.formatValueToReal();
 
         if(this.isLogged){
@@ -263,6 +266,13 @@
 
         this.resetTransactionsFields();
       },
+      checkPermitions: function(){
+        if(!this.isLogged && this.transactions.length >= 3){
+          alert('Você atingiu o limite de transições para usuários sem conta!')
+          return false;
+        }
+        return true
+      },  
       async sendNewTransactionToDb() {
           let response = await this.$axios.$post('http://127.0.0.1:8000/api/newTransaction',{
               userId: this.loggedUser['id'],
