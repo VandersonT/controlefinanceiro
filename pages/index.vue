@@ -32,6 +32,7 @@
           
           <warning v-if="!isLogged" msg="Crie uma conta para ter acesso às suas transações de qualquer lugar."/>
 
+          
           <div class="transactionSingle" v-for="(transaction, index) in transactions" v-bind:key="transaction.id">
             <!--Positive Transaction structure-->
             <article class="boxTransactionInfo" v-if="transaction['totalValue'] >= 0">
@@ -83,8 +84,13 @@
                 </div>
               </div>
             </article>
-
           </div>
+
+          <p class="empty" v-if="transactions < 1">
+            <i class="far fa-dizzy"></i>
+            Você ainda não realizou nenhuma transação
+          </p>
+
         </section>
 
         <!--Section To Send New Transaction-->
@@ -162,13 +168,7 @@
 
         /*New Transaction Datas*/
         transictionSelected: -1,
-        transactions: [
-          {id: 1, title: 'Site MaxCorres', date: '25/12/2025', totalValue: 2500.10, netValue: 2000.08, savedValue: 500.02},
-          {id: 2, title: 'X-box One', date: '25/12/2025', takenFrom: 'Disponivel', totalValue: -1000.00},
-          {id: 3, title: 'Site advogado teteu', date: '25/12/2025', totalValue: 500.00, netValue: 300.00, savedValue: 200.00},
-          {id: 4, title: 'torradeira plut', date: '25/12/2025', takenFrom: 'Emergêncial', totalValue: -500.00},
-          {id: 5, title: 'ganhei da Be', date: '25/12/2025', totalValue: 800.00, netValue: 800.00, savedValue: 0.00}
-        ],
+        transactions: [],
         selectedTransaction: 'deposit',
         showBoxNewTransaction: false,
 
@@ -188,10 +188,6 @@
     methods:{
       moreTransactionInfo: function(idToOpen){
         
-        if(this.isLogged){
-          alert('logado');
-        }
-        return 
         let allBoxMoreInfo = document.querySelectorAll('.moreTransactionInfo');
         let arrows = document.querySelectorAll('.arrow');
         
@@ -535,6 +531,14 @@
     color: rgb(134, 10, 10);
   }
 
+  .empty{
+    text-align: center;
+    padding: 20px 10px;
+    font-size: 17px;
+    color: rgb(65, 65, 65);
+    font-family: 'Roboto Condensed', sans-serif;
+  }
+
   /*-------Main > ScreenNewTransaction-------*/
   .screenNewTransaction{
     position: fixed;
@@ -668,10 +672,12 @@
     .boxNewTransaction{
       width: 90%;
     }
-
     .boxNewTransaction select,
     .fieldNewTransaction{
       font-size: 12px;
+    }
+    .empty{
+      font-size: 14px;
     }
   }
 
