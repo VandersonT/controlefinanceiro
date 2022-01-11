@@ -12,14 +12,14 @@
                   <span>Disponivel</span>
                   <i class="far fa-arrow-alt-circle-up up"></i>
                 </div>
-                <p class="infoFinanceSingle--value">R$ 500.000,00</p>
+                <p class="infoFinanceSingle--value">R$ {{netValueTotal.toFixed(2).replace('.', ',')}}</p>
               </div>
               <div class="infoFinanceSingle infoFinanceSingle__blue">
                 <div class="infoFinanceSingle--title">
                   <span>Emergência</span>
                   <i class="fas fa-lock emergency"></i>
                 </div>
-                <p class="infoFinanceSingle--value">R$ 0,00</p>
+                <p class="infoFinanceSingle--value">R$ {{savedValueTotal.toFixed(2).replace('.', ',')}}</p>
               </div>
           </div>
         </section>
@@ -166,7 +166,9 @@
         loggedUser: [],
         loading: true,
 
-        /*New Transaction Datas*/
+        /*Transaction Datas*/
+        netValueTotal: 0,
+        savedValueTotal: 0,
         transictionSelected: -1,
         transactions: [],
         selectedTransaction: 'deposit',
@@ -311,11 +313,25 @@
       async getLoggedUser(token){
         this.isLogged = true;
 
-        let response = await this.$axios.$post('http://127.0.0.1:8000/api/auth',{
+        await this.$axios.$post('http://127.0.0.1:8000/api/auth',{
             token: token,
+        })
+        .then(response=>{
+          this.loggedUser = response.loggedUser;
+          this.loading = false;
+        })
+        .finally(()=>{
+          this.getUserTransactions();
         });
-        this.loggedUser = response.loggedUser;
-        this.loading = false;
+        
+      },
+      async getUserTransactions(){
+        let id = this.loggedUser['id'];
+        await this.$axios.$get('http://127.0.0.1:8000/api/userTransactions/'+this.loggedUser['id'])
+        .then(response=>{
+          this.savedValueTotal = response['saveValueTotal'];
+          this.netValueTotal = response['netValueTotal'];
+        });
       }
     },
 
@@ -336,7 +352,7 @@
 
         if(parseFloat(this.savedAmount) > parseFloat(this.totalTransactionAmount) || !this.totalTransactionAmount){
           this.savedAmount = this.lastSavedAmountValid;
-          this.savedAmountError = true;
+          //this.savedAmountError = true;
         }else{
           this.lastSavedAmountValid = this.savedAmount;
         }
@@ -364,7 +380,8 @@
       }
       
       if(Cookies.get('token')){
-        this.getLoggedUser(Cookies.get('token'))
+        this.getLoggedUser(Cookies.get('token'));
+        //this.getUserTransactions();
       }else{
         this.loading = false;
       }
