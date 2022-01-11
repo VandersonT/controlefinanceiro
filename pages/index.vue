@@ -12,7 +12,7 @@
                   <span>Disponivel</span>
                   <i class="far fa-arrow-alt-circle-up up"></i>
                 </div>
-                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">R$ {{netValueTotal.toFixed(2).replace('.', ',')}}</p>
+                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">R$ {{netValueTotal.toLocaleString('pt-BR')}}</p>
                 <p v-if="loadingTransactionInfo" class="loadingTransactionInfo">Carregando...</p>
               </div>
               <div class="infoFinanceSingle infoFinanceSingle__blue">
@@ -20,7 +20,7 @@
                   <span>Emergência</span>
                   <i class="fas fa-lock emergency"></i>
                 </div>
-                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">R$ {{savedValueTotal.toFixed(2).replace('.', ',')}}</p>
+                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">R$ {{savedValueTotal.toLocaleString('pt-BR')}}</p>
                 <p v-if="loadingTransactionInfo" class="loadingTransactionInfo">Carregando...</p>
               </div>
           </div>
@@ -41,21 +41,21 @@
               <div @click="moreTransactionInfo(index)" class="transactionInfo">
                 <p>{{transaction['description']}}</p>
                 <div class="info2">
-                  <p class="positiveValue">R$ {{transaction['total'].toFixed(2).replace(".", ",")}}</p>
+                  <p class="positiveValue">R$ {{transaction['total'].toLocaleString('pt-BR')}}</p>
                   <p  class="arrow"><i class="fas fa-chevron-left"></i></p>
                 </div>
               </div>
               <div class="moreTransactionInfo">
                 <div class="fieldTransaction">
                   <p><b>Descrição:</b> {{transaction['description']}}</p>
-                  <p><b>Valor Guardado:</b> R${{transaction['savedValue'].toFixed(2).replace(".", ",")}}</p>
+                  <p><b>Valor Guardado:</b> R${{transaction['savedValue'].toLocaleString('pt-BR')}}</p>
                 </div>
                 <div class="fieldTransaction">
                   <p><b>Data:</b> {{transaction['date']}}</p>
-                  <p><b>Valor Liquido:</b> R${{transaction['netValue'].toFixed(2).replace(".", ",")}}</p>
+                  <p><b>Valor Liquido:</b> R${{transaction['netValue'].toLocaleString('pt-BR')}}</p>
                 </div>
                 <div class="fieldTransaction centerField">
-                  <p><b>Valor Total:</b> R${{transaction['total'].toFixed(2).replace(".", ",")}}</p>
+                  <p><b>Valor Total:</b> R${{transaction['total'].toLocaleString('pt-BR')}}</p>
                 </div>
                 <div class="boxButtons">
                   <button @click="deleteTransaction(transaction['id'], index)"><i class="fas fa-trash-alt trashIcon"></i></button>
@@ -264,7 +264,7 @@
       async sendNewTransactionToDb() {
           let response = await this.$axios.$post('http://127.0.0.1:8000/api/newTransaction',{
               userId: this.loggedUser['id'],
-              total: (this.selectedTransaction == 'deposit') ? parseInt(this.totalTransactionAmount) : (~parseFloat(this.totalTransactionAmount) + 1),
+              total: (this.selectedTransaction == 'deposit') ? this.totalTransactionAmount : (~parseFloat(this.totalTransactionAmount) + 1),
               description: this.titleTransaction,
               date: this.date,
               takenFrom: this.takenFrom,
