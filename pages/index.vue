@@ -262,15 +262,29 @@
 
         if(!this.isLogged){
           localStorage.setItem('transactions', JSON.stringify(this.transactions));
+          this.netValueTotal = 0;
+          this.savedValueTotal = 0;
+          for(let i = 0; i < this.transactions.length; i++){
+            this.netValueTotal = this.netValueTotal + this.transactions[i]['netValue'];
+            this.savedValueTotal = this.savedValueTotal + this.transactions[i]['savedValue'];
+          }
         }
 
         this.resetTransactionsFields();
       },
       checkPermitions: function(){
-        if(!this.isLogged && this.transactions.length >= 3){
-          alert('Você atingiu o limite de transições para usuários sem conta!')
+        if(!this.isLogged && this.transactions.length >= 25){
+          alert('Você atingiu o limite de transações para usuários sem conta!')
           return false;
         }
+
+        if(this.isLogged){
+          if(this.loggedUser['access'] == 0 && this.transactions.length >= 30){
+            alert('Para realizar mais transações confirme sua conta no email!');
+            return false;
+          }
+        }
+
         return true
       },  
       async sendNewTransactionToDb() {
@@ -462,6 +476,11 @@
         this.loadingTransactionInfo = false;
         this.loadingTransactions = false;
         this.transactions = JSON.parse(localStorage.getItem("transactions"));
+
+        for(let i = 0; i < this.transactions.length; i++){
+          this.netValueTotal = this.netValueTotal + this.transactions[i]['netValue'];
+          this.savedValueTotal = this.savedValueTotal + this.transactions[i]['savedValue'];
+        }
       }
 
     }
