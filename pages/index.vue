@@ -426,10 +426,18 @@
           this.transactions = response.transactions.data;
           this.currentPage = response.transactions.current_page;
 
-          let totalPaginate = this.totalTransactions - (this.totalTransactions / 2);
+          let totalPaginate = this.totalTransactions;
+          let count = 1;
+          let perPage = 30;
           this.paginate = [];
-          for(let i = 0; i < totalPaginate.toFixed(); i++)
-            this.paginate.push(i+1)
+
+          while(totalPaginate > perPage){
+              totalPaginate = totalPaginate - perPage;
+              this.paginate.push(count);
+              count = count + 1;
+          }
+          this.paginate.push(count);
+
         })
         .finally(()=>{
           this.loadingTransactions = false;
