@@ -243,8 +243,6 @@
         if(this.isLogged){
           if(!this.sendNewTransactionToDb())
             return false;
-        }else{
-          //salva mo local storage
         }
 
         /*Get ID to add a new transaction*/
@@ -257,6 +255,10 @@
           case 'toWithdraw':
             this.transactions.unshift({id: id, description: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, total: (~parseFloat(this.totalTransactionAmount) + 1)});
             break;
+        }
+
+        if(!this.isLogged){
+          localStorage.setItem('transactions', JSON.stringify(this.transactions));
         }
 
         this.resetTransactionsFields();
@@ -441,10 +443,15 @@
       }
       
       if(Cookies.get('token')){
+        /*User is logged in, so get his information from data base*/
         this.isLogged = true;
         this.getLoggedUserInfo(Cookies.get('token'));
       }else{
+        /*User is not logged in, so get his information from LocalStorage*/
         this.loading = false;
+        this.loadingTransactionInfo = false;
+        this.loadingTransactions = false;
+        this.transactions = JSON.parse(localStorage.getItem("transactions"));
       }
 
     }
