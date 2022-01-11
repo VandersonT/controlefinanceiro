@@ -258,7 +258,7 @@
             this.transactions.unshift({id: id, description: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, total: (~parseFloat(this.totalTransactionAmount) + 1)});
             break;
         }
-        
+
         this.resetTransactionsFields();
       },
       async sendNewTransactionToDb() {
@@ -277,6 +277,9 @@
               this.errorMessage = response['error'];
               return false;
           }
+
+          this.getUserTransactionsInfo();
+
           return true;
       },
       idGenerator: function(){
