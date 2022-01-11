@@ -88,6 +88,11 @@
             </article>
           </div>
 
+          <!--paginate aqui-->
+          <div class="boxPaginate" v-if="paginate.length > 1">
+              <span  onselectstart="return false" @click="changePage(page)" :class="(currentPage == page) ? 'selectedPage' : ''" v-for="page in paginate" v-bind:key="page">{{page}}</span>
+          </div>
+
           <p class="empty" v-if="transactions < 1 && !loadingTransactions">
             <i class="far fa-dizzy"></i>
             Você ainda não realizou nenhuma transação
@@ -175,6 +180,9 @@
         /*Transaction Datas*/
         netValueTotal: 0,
         savedValueTotal: 0,
+        totalTransactions: 0,
+        paginate: [],
+        currentPage: 1,
         transictionSelected: -1,
         transactions: [],
         selectedTransaction: 'deposit',
@@ -194,6 +202,9 @@
     },
 
     methods:{
+      changePage: function(page){
+        this.getUserTransactions(page)
+      },
       moreTransactionInfo: function(idToOpen){
         
         let allBoxMoreInfo = document.querySelectorAll('.moreTransactionInfo');
@@ -398,20 +409,27 @@
         .then(response=>{
           this.savedValueTotal = response['saveValueTotal'];
           this.netValueTotal = response['netValueTotal'];
+          this.totalTransactions = response['totalTransitions'];
         })
         .finally(()=>{
           this.loadingTransactionInfo = false;
-          this.getUserTransactions()
+          this.getUserTransactions(1)
         })
         .catch(()=>{
           this.isLogged = false;
         });
       },
-      async getUserTransactions(){
+      async getUserTransactions(page){
         let id = this.loggedUser['id'];
-        await this.$axios.$get('http://127.0.0.1:8000/api/userTransactions/'+this.loggedUser['id'])
+        await this.$axios.$get('http://127.0.0.1:8000/api/userTransactions/'+this.loggedUser['id']+'?page='+page)
         .then(response=>{
           this.transactions = response.transactions.data;
+          this.currentPage = response.transactions.current_page;
+
+          let totalPaginate = this.totalTransactions - (this.totalTransactions / 2);
+          this.paginate = [];
+          for(let i = 0; i < totalPaginate.toFixed(); i++)
+            this.paginate.push(i+1)
         })
         .finally(()=>{
           this.loadingTransactions = false;
@@ -656,6 +674,27 @@
     font-size: 17px;
     color: rgb(65, 65, 65);
     font-family: 'Roboto Condensed', sans-serif;
+  }
+
+  .boxPaginate{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .boxPaginate span{
+    background: rgb(0, 140, 255);
+    padding: 4px 8px;
+    margin: 5px 5px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .selectedPage,
+  .boxPaginate span:hover{
+    background: rgb(0, 45, 192) !important;
   }
 
   /*-------Main > ScreenNewTransaction-------*/
