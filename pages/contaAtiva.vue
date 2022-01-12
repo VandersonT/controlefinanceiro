@@ -1,31 +1,41 @@
 <template>
     <main>
 
-        <section v-if="!accountConfirmed" class="mainBox">
-            <h1 class="confirm">Confirme sua Conta</h1>
-            <p>Você está a um passo de liberar sua para ter acesso à 100% do sistema.</p>
-            <p>Para que isso ocorra, clique no botão abaixo.</p>
-            <img src="images/happy.png" />
-            <button class="buttonConfirm">Confirmar</button>
-        </section>
-
-        <section v-else class="mainBox">
-            <h1 class="confirmed">Conta Confirmada</h1>
-            <p>Uhuul, sua conta foi ativada com sucesso! Agora você pode ultilizar o sistema sem nenhum problema!</p>
+        <section class="mainBox">
+            <h1>Conta Ativa</h1>
+            <p>Uhuul, parabéns, {{loggedUser['nickname']}}, sua conta está ativa! Você pode ultilizar o sistema sem nenhum empecilho!</p>
             <img src="images/celebrating.png" />
-            <button class="buttonConfirmed">Início</button>
+            <nuxt-link class="confirmedButton" to="/">Início</nuxt-link>
         </section>
 
     </main>
 </template>
 
 <script>
+    import Cookies from 'js-cookie'
     export default {
+        beforeMount: function(){
+            (!Cookies.get('token')) ? this.$router.push('/') : '';
+        },
         head: {title: 'Conta Confirmada'},
         data: () => {
             return {
-                accountConfirmed: true
+                loggedUser: []
             }
+        },
+        methods:{
+            async getUserInfo(token){
+                await this.$axios.$post('http://127.0.0.1:8000/api/auth',{
+                    token: token
+                })
+                .then(response=>{
+                    this.loggedUser = response.loggedUser;
+                    this.loggedUser['nickname'] = this.loggedUser['name'].split(' ')[0];
+                })
+            },
+        },
+        mounted: function(){
+            this.getUserInfo(Cookies.get('token'));
         }
     }
 </script>
@@ -55,12 +65,7 @@
         box-shadow: 0px 0px 12px -3px rgba(0,0,0,0.42);
         text-align: center;
     }
-    /*Title*/
-    .confirm{
-        color: #615FE1;
-        margin-bottom: 10px;
-    }
-    .confirmed{
+    .mainBox h1{
         color: #0CD675;
         margin-bottom: 10px;
     }
@@ -73,26 +78,16 @@
         height: 100px;
         margin: 18px 0 15px 0;
     }
-    .mainBox button{
+    .mainBox .confirmedButton{
       margin: 10px;
-      padding: 10px 25px;
+      padding: 8px 22px;
       border-radius: 5px;
       color: white;
-    }
-    
-    /*Custom Button*/
-    .buttonConfirm{
-      background: #00C2FF;
-      font-weight: bold;
-    }
-    .buttonConfirm:hover{
-      background: #00bcf5;
-    }
-    .buttonConfirmed{
       background: #FFA800;
       font-weight: bold;
+      text-decoration: none;
     }
-    .buttonConfirmed:hover{
+    .mainBox .confirmedButton:hover{
       background: #f5a300;
     }
     /***/
