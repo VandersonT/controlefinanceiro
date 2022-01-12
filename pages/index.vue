@@ -230,9 +230,17 @@
           return false;
         }
 
-        //deleta no banco de dados a transição id: idTransaction
-        //faça uma nova requisição para saber os novos valores da informações principais lá dos blocos
+        if(this.isLogged){
+          //deleta no banco de dados a transição id: idTransaction
+          //faça uma nova requisição para saber os novos valores da informações principais lá dos blocos
+        }else{
+          
+        }
+
         this.transactions.splice(index, 1);
+        if(!this.isLogged){
+          localStorage.setItem('transactions', JSON.stringify(this.transactions));
+        }
       },
       selectAnAction: function(action){
         this.selectedTransaction = action;
@@ -243,44 +251,27 @@
         this.savedAmountError = false;
       },
       confirmTransaction: function(){
-
+        /*Validate fields*/
         if(!this.fieldsValidate()){
           alert('Por favor, preencha todos os campos');
           return false;
         }
 
+        /*check if user have permission*/
         if(!this.checkPermitions())
           return false;
 
+        /*Format values to real format R$*/
         this.formatValueToReal();
 
+        /*Save in DataBase if is logged OR in LocalStorage if not*/
         if(this.isLogged){
-          if(!this.sendNewTransactionToDb())
-            return false;
+          this.sendNewTransactionToDb()
+        }else{
+          this.sendNewTrasactionToLocalStorage()
         }
 
-        /*Get ID to add a new transaction*/
-        let id = this.idGenerator();
-
-        switch(this.selectedTransaction){
-          case 'deposit':
-            this.transactions.unshift({id: id, description: this.titleTransaction, date: this.date, total: parseFloat(this.totalTransactionAmount), netValue: (parseFloat(this.totalTransactionAmount) - parseFloat(this.savedAmount)), savedValue: parseFloat(this.savedAmount)})
-            break;
-          case 'toWithdraw':
-            this.transactions.unshift({id: id, description: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, total: (~parseFloat(this.totalTransactionAmount) + 1)});
-            break;
-        }
-
-        if(!this.isLogged){
-          localStorage.setItem('transactions', JSON.stringify(this.transactions));
-          this.netValueTotal = 0;
-          this.savedValueTotal = 0;
-          for(let i = 0; i < this.transactions.length; i++){
-            this.netValueTotal = this.netValueTotal + this.transactions[i]['netValue'];
-            this.savedValueTotal = this.savedValueTotal + this.transactions[i]['savedValue'];
-          }
-        }
-
+        /*Rests new transactions fields*/
         this.resetTransactionsFields();
       },
       checkPermitions: function(){
@@ -310,14 +301,33 @@
           });
 
           if(response['error'] != ''){
-              this.errorLogin = true;
-              this.errorMessage = response['error'];
+              alert(response['error']);
               return false;
           }
 
           this.getUserTransactionsInfo();
+          this.getUserTransactions(1)
+      },
+      sendNewTrasactionToLocalStorage: function(){
+        /*Get ID to add a new transaction*/
+        let id = this.idGenerator();
 
-          return true;
+        switch(this.selectedTransaction){
+          case 'deposit':
+            this.transactions.unshift({id: id, description: this.titleTransaction, date: this.date, total: parseFloat(this.totalTransactionAmount), netValue: (parseFloat(this.totalTransactionAmount) - parseFloat(this.savedAmount)), savedValue: parseFloat(this.savedAmount)})
+            break;
+          case 'toWithdraw':
+            this.transactions.unshift({id: id, description: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, total: (~parseFloat(this.totalTransactionAmount) + 1)});
+            break;
+        }
+
+        localStorage.setItem('transactions', JSON.stringify(this.transactions));
+        this.netValueTotal = 0;
+        this.savedValueTotal = 0;
+        for(let i = 0; i < this.transactions.length; i++){
+          this.netValueTotal = this.netValueTotal + this.transactions[i]['netValue'];
+          this.savedValueTotal = this.savedValueTotal + this.transactions[i]['savedValue'];
+        }
       },
       idGenerator: function(){
         let char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -448,7 +458,7 @@
 
           let totalPaginate = this.totalTransactions;
           let count = 1;
-          let perPage = 30;
+          let perPage = 2;
           this.paginate = [];
 
           while(totalPaginate > perPage){
@@ -457,10 +467,10 @@
               count = count + 1;
           }
           this.paginate.push(count);
-
         })
         .finally(()=>{
           this.loadingTransactions = false;
+          console.log(this.transactions)
         })
         .catch(()=>{
           this.isLogged = false;
