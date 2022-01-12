@@ -82,6 +82,7 @@
         height: 48px;
         border-radius: 50px;
         margin-right: 10px;
+        border: 1px solid rgb(58, 58, 58);
     }
     .menuButton .headerButton{
         background: rgb(228, 222, 212);

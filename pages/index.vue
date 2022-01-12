@@ -464,7 +464,7 @@
 
           let totalPaginate = this.totalTransactions;
           let count = 1;
-          let perPage = 2;
+          let perPage = 30;
           this.paginate = [];
 
           while(totalPaginate > perPage){
@@ -517,11 +517,14 @@
         this.loading = false;
         this.loadingTransactionInfo = false;
         this.loadingTransactions = false;
-        this.transactions = JSON.parse(localStorage.getItem("transactions"));
 
-        for(let i = 0; i < this.transactions.length; i++){
-          this.netValueTotal = this.netValueTotal + this.transactions[i]['netValue'];
-          this.savedValueTotal = this.savedValueTotal + this.transactions[i]['savedValue'];
+        
+        if(localStorage.getItem("transactions")){
+          this.transactions = JSON.parse(localStorage.getItem("transactions"));
+          for(let i = 0; i < this.transactions.length; i++){
+            this.netValueTotal = this.netValueTotal + this.transactions[i]['netValue'];
+            this.savedValueTotal = this.savedValueTotal + this.transactions[i]['savedValue'];
+          }
         }
       }
 

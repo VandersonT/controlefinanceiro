@@ -16,16 +16,16 @@
             <nuxt-link to="/cadastro" class="link">Não possui uma conta? Cadastre-se</nuxt-link>
         </section>
 
-        <section class="alternateLogin">
+        <!--<section class="alternateLogin">
             <div class="alternateLogin__logo">
                 <img src="images/googleIcon.png" />
                 <p>Google</p>
             </div>
             <div class="alternateLogin__logo">
                 <img src="images/facebookIcon.png" />
-                <p>Google</p>
+                <p>Facebook</p>
             </div>
-        </section>
+        </section>-->
 
     </main>
 </template>
