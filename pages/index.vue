@@ -7,22 +7,25 @@
         <section class="boxFinanceInfo">
           <h1><i class="fas fa-dollar-sign"></i> Controle Financeiro</h1>
           <div class="boxInfoFinance">
+              
               <div class="infoFinanceSingle">
                 <div class="infoFinanceSingle--title">
                   <span>Disponivel</span>
-                  <i class="far fa-arrow-alt-circle-up up"></i>
+                  <i @click="toggleNetValue()" class="fas fa-eye eyes" :class="showNetValue ? 'fa-eye' : 'fa-eye-slash'"></i>
                 </div>
-                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">R$ {{netValueTotal.toLocaleString('pt-BR')}}</p>
+                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">{{showNetValue ? 'R$ '+netValueTotal.toLocaleString('pt-BR') : '-----'}}</p>
                 <p v-if="loadingTransactionInfo" class="loadingTransactionInfo">Carregando...</p>
               </div>
+
               <div class="infoFinanceSingle infoFinanceSingle__blue">
                 <div class="infoFinanceSingle--title">
                   <span>Emergência</span>
-                  <i class="fas fa-lock emergency"></i>
+                  <i @click="toggleSavedValue()" class="fas eyes" :class="showSavedValue ? 'fa-eye' : 'fa-eye-slash'"></i>
                 </div>
-                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">R$ {{savedValueTotal.toLocaleString('pt-BR')}}</p>
+                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">{{showSavedValue ? 'R$ '+savedValueTotal.toLocaleString('pt-BR') : '-----'}}</p>
                 <p v-if="loadingTransactionInfo" class="loadingTransactionInfo">Carregando...</p>
               </div>
+
           </div>
         </section>
 
@@ -176,6 +179,8 @@
         loading: true,
         loadingTransactionInfo: true,
         loadingTransactions: true,
+        showNetValue: true,
+        showSavedValue: true,
 
         /*Transaction Datas*/
         netValueTotal: 0,
@@ -202,6 +207,12 @@
     },
 
     methods:{
+      toggleNetValue: function(){
+        this.showNetValue = !this.showNetValue;
+      },
+      toggleSavedValue: function(){
+        this.showSavedValue = !this.showSavedValue;
+      },
       changePage: function(page){
         this.getUserTransactions(page)
       },
@@ -589,13 +600,12 @@
   .infoFinanceSingle--title span{
     font-size: 18px;
   }
-  .up{
-    font-size: 28px;
-    color: rgb(0, 185, 0);
+  .eyes{
+    cursor: pointer;
+    font-size: 17px;
   }
-  .emergency{
-    font-size: 28px;
-    color: #6b1616;
+  .eyes:hover{
+    font-size: 18px;
   }
   .infoFinanceSingle--value{
     text-align: center;
