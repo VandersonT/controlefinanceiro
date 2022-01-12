@@ -231,16 +231,23 @@
         }
 
         if(this.isLogged){
-          //deleta no banco de dados a transição id: idTransaction
-          //faça uma nova requisição para saber os novos valores da informações principais lá dos blocos
+          this.deleteTransactionFromDb(idTransaction);
         }else{
-          
+          this.deleteTransactionFromLocalStorage(index);
         }
-
+      },
+      async deleteTransactionFromDb(idTransaction){
+        this.$axios.$delete('http://127.0.0.1:8000/api/deleteTransition/'+idTransaction)
+        .finally(()=>{
+          if(this.transactions.length <= 1){
+            this.currentPage = this.currentPage - 1;
+          }
+          this.getUserTransactionsInfo();
+        });
+      },
+      deleteTransactionFromLocalStorage(index){
         this.transactions.splice(index, 1);
-        if(!this.isLogged){
-          localStorage.setItem('transactions', JSON.stringify(this.transactions));
-        }
+        localStorage.setItem('transactions', JSON.stringify(this.transactions));
       },
       selectAnAction: function(action){
         this.selectedTransaction = action;
@@ -304,9 +311,8 @@
               alert(response['error']);
               return false;
           }
-
+          this.currentPage = 1;
           this.getUserTransactionsInfo();
-          this.getUserTransactions(1)
       },
       sendNewTrasactionToLocalStorage: function(){
         /*Get ID to add a new transaction*/
@@ -443,7 +449,7 @@
         })
         .finally(()=>{
           this.loadingTransactionInfo = false;
-          this.getUserTransactions(1)
+          this.getUserTransactions(this.currentPage)
         })
         .catch(()=>{
           this.isLogged = false;
@@ -470,7 +476,6 @@
         })
         .finally(()=>{
           this.loadingTransactions = false;
-          console.log(this.transactions)
         })
         .catch(()=>{
           this.isLogged = false;
