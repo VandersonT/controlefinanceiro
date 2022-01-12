@@ -42,6 +42,7 @@
       margin: 10px;
       padding: 10px 25px;
       border-radius: 5px;
+      text-decoration: none;
     }
 
     /*Button Cancel*/

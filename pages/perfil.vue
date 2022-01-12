@@ -1,46 +1,49 @@
 <template>
     <main>
         <section class="profileBox">
-            <warning v-if="updatedSuccessfully" msg="Seu perfil foi atualizado com sucesso"/>
-            <error v-if="failedToUpdate" msg="Não foi possivel atualizar o seu perfil"/>
-            <img src="images/no-picture.png" />
-            <h1>Vanderson Thiago</h1>
+            <warning v-if="updatedSuccessfully" :msg="flashMsg"/>
+            <error v-if="failedToUpdate" :msg="flashMsg"/>
+            <img :src="loggedUser['avatar']" />
+            <h1>{{loggedUser['name']}}</h1>
 
             <h3>Theme</h3>
             <div class="selectAnAction">
                 <div class="boxAction">
-                    <button @click="selectAnAction('deposit')" class="select" :class="selectedTransaction == 'deposit' ? 'selected' : ''"></button>
-                    Default
+                    <button @click="selectAnAction('default')" class="select" :class="loggedUser['theme'] == 'default' ? 'selected' : ''"></button>
+                    Padrão
                 </div>
                 <div class="boxAction">
-                    <button @click="selectAnAction('Theme1')" class="select" :class="selectedTransaction == 'Theme1' ? 'selected' : ''"></button>
+                    <button @click="selectAnAction('theme1')" class="select" :class="loggedUser['theme'] == 'theme1' ? 'selected' : ''"></button>
                     Theme1
                 </div>
                 <div class="boxAction">
-                    <button @click="selectAnAction('Theme2')" class="select" :class="selectedTransaction == 'Theme2' ? 'selected' : ''"></button>
+                    <button @click="selectAnAction('theme2')" class="select" :class="loggedUser['theme'] == 'theme2' ? 'selected' : ''"></button>
                     Theme2
                 </div>
                 <div class="boxAction">
-                    <button @click="selectAnAction('theme3')" class="select" :class="selectedTransaction == 'theme3' ? 'selected' : ''"></button>
+                    <button @click="selectAnAction('theme3')" class="select" :class="loggedUser['theme'] == 'theme3' ? 'selected' : ''"></button>
                     theme3
                 </div>
                 <div class="boxAction">
-                    <button @click="selectAnAction('theme4')" class="select" :class="selectedTransaction == 'theme4' ? 'selected' : ''"></button>
+                    <button @click="selectAnAction('theme4')" class="select" :class="loggedUser['theme'] == 'theme4' ? 'selected' : ''"></button>
                     theme4
                 </div>
             </div>
 
             <h3>Usuário</h3>
-            <input class="styleInput" type="text"/>
-
+            <input v-model="loggedUser['name']" class="styleInput" type="text"/>
+            
             <h3>Email</h3>
-            <input class="styleInput" type="text"/>
+            <input v-model="loggedUser['email']" class="styleInput" type="text"/>
+
+            <h3>Escolha sua foto</h3>
+            <input id="file" class="styleInput" type="file"/>
 
             <h3>Senha Atual</h3>
-            <input class="styleInput" type="password"/>
+            <input v-model="oldPass" class="styleInput" type="password" placeholder="Somente se for troca-la no campo abaixo"/>
 
             <h3>Nova Senha</h3>
-            <input class="styleInput" :type="(showPass) ? 'text' : 'password'"/>
+            <input v-model="newPass" class="styleInput" :type="(showPass) ? 'text' : 'password'"/>
 
             <div class="keepConnected">
                 <input type="checkbox" @click="showPassToggle" />
@@ -48,15 +51,19 @@
             </div>
 
             <div class="ButtonsBox">
-              <button @click="toggleBoxNewTransaction()" class="button button__close">Voltar</button>
-              <button @click="confirmTransaction()" class="button button--update">Atualizar</button>
+              <nuxt-link to="/" @click="toggleBoxNewTransaction()" class="button button__close">Voltar</nuxt-link>
+              <button @click="updateProfile()" class="button button--update">Atualizar</button>
             </div>
         </section>
     </main>
 </template>
 
 <script>
+    import Cookies from 'js-cookie'
     export default{
+        beforeMount: function(){
+            (!Cookies.get('token')) ? this.$router.push('/') : '';
+        },
         head: {
             name: 'IndexPage',
             title: 'Meu Perfil',
@@ -73,18 +80,112 @@
         },
         data: () => {
             return {
-                selectedTransaction: 'deposit',
+                loggedUser: [],
                 showPass: false,
                 updatedSuccessfully: false,
-                failedToUpdate: false
+                failedToUpdate: false,
+                flashMsg: '',
+                oldPass: '',
+                newPass: ''
             }
         },
         methods: {
+            async getUserInfo(token){
+                await this.$axios.$post('http://127.0.0.1:8000/api/auth',{
+                    token: token
+                })
+                .then(response=>{
+                    this.loggedUser = response.loggedUser;
+                })
+                .finally(()=>{
+                    this.changeProfileTheme();
+                })
+            },
+            async updateProfile(){
+                if(!this.validateProfileFields())
+                    return false;
+
+                let data = new FormData();
+
+                data.append('file', document.getElementById('file').files[0]);
+
+                var fileVerify = document.getElementById('file');
+                var photoUpdated = false;
+
+                if(fileVerify.value){
+                    await this.$axios.$post('http://127.0.0.1:8000/api/editUserAvatar/'+this.loggedUser['id'],data)
+                    .finally(()=>{
+                        photoUpdated = true;
+                    })
+                }
+
+                await this.$axios.$put('http://127.0.0.1:8000/api/editUser/',{
+                    id: this.loggedUser['id'],
+                    name: this.loggedUser['name'],
+                    email: this.loggedUser['email'],
+                    theme: this.loggedUser['theme'],
+                    oldPass: this.oldPass,
+                    newPass: this.newPass,
+                    avatarUpdated: photoUpdated
+                })
+                .then(response=>{
+                    if(response['error'] == ''){
+                        this.failedToUpdate = false;
+                        this.updatedSuccessfully = true;
+                        this.flashMsg = response['success'];
+                    }else{
+                        this.updatedSuccessfully = false;
+                        this.failedToUpdate = true;
+                        this.flashMsg = response['error'];
+                    }
+                })
+                .finally(()=>{
+                    this.changeProfileTheme();
+                    window.scrollTo({top: 0});
+                })
+            },
+            validateProfileFields: function(){
+                if(this.newPass && !this.oldPass){
+                    alert('Para definir uma nova senha nos informe a antiga.');
+                    return false;
+                }
+                if(this.loggedUser['name'] == '' || this.loggedUser['email'] == ''){
+                    alert('Os campos usuário e email devem estar preenchidos');
+                    return false;
+                }
+                let user = this.loggedUser['email'].substring(0, this.loggedUser['email'].indexOf("@"));
+                let dominio = this.loggedUser['email'].substring(this.loggedUser['email'].indexOf("@")+ 1, this.loggedUser['email'].length);
+
+                if (!((user.length >=1) && (dominio.length >=3) && (user.search("@")==-1) && (dominio.search("@")==-1) && (user.search(" ")==-1) && (dominio.search(" ")==-1) && (dominio.search(".")!=-1) && (dominio.indexOf(".") >=1) && (dominio.lastIndexOf(".") < dominio.length - 1))){
+                    alert('O email enviado não é valido');
+                    return false;
+                }
+                return true;
+            },
             selectAnAction: function(action){
-                this.selectedTransaction = action;
+                this.loggedUser['theme'] = action;
             },
             showPassToggle: function(){
                 this.showPass = !this.showPass;
+            },
+            changeProfileTheme: function(){
+                switch(this.loggedUser['theme']){
+                    case 'default':
+                        this.changeToDefaultTheme();
+                        break;
+                    case 'theme1':
+                        this.changeToTheme1();
+                        break;
+                    case 'theme2':
+                        this.changeToTheme2();
+                        break;
+                    case 'theme3':
+                        this.changeToDefaultTheme();
+                        break;
+                    case 'theme4':
+                        this.changeToDefaultTheme();
+                        break;
+                }
             },
             changeToDefaultTheme: function(){
                 document.querySelector('main').style.background = '#C5C5C5';
@@ -152,28 +253,11 @@
                     input[i].style.background = 'white';
                     input[i].style.color = '#333332';
                 }
-            }
+            },
         },
         
         mounted: function(){
-            let theme = 'default';
-            switch(theme){
-                case 'default':
-                this.changeToDefaultTheme();
-                break;
-                case 'theme1':
-                this.changeToTheme1();
-                break;
-                case 'theme2':
-                this.changeToTheme2();
-                break;
-                case 'theme3':
-                this.changeToDefaultTheme();
-                break;
-                case 'theme4':
-                this.changeToDefaultTheme();
-                break;
-            }
+            this.getUserInfo(Cookies.get('token'));
         }
     }
 </script>
