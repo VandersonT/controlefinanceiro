@@ -357,6 +357,25 @@
         this.takenFrom = '',
         this.date = ''
       },
+      changeHomeTheme: function(){
+        switch(this.loggedUser['theme']){
+          case 'default':
+            this.changeToDefaultTheme();
+            break;
+          case 'theme1':
+            this.changeToTheme1();
+            break;
+          case 'theme2':
+            this.changeToTheme2();
+            break;
+          case 'theme3':
+            this.changeToTheme3();
+            break;
+          case 'theme4':
+            this.changeToTheme4();
+            break;
+        }
+      },
       changeToDefaultTheme: function(){
         document.body.style.setProperty('--mainBackground', '#C9C9C9');
         document.body.style.setProperty('--header', '#111319');
@@ -394,6 +413,7 @@
         })
         .then(response=>{
           this.loggedUser = response.loggedUser;
+          this.changeHomeTheme();
         })
         .finally(()=>{
           this.loading = false;
@@ -473,25 +493,6 @@
     },
 
     mounted: function(){
-      let theme = 'default';
-      switch(theme){
-        case 'default':
-          this.changeToDefaultTheme();
-          break;
-        case 'theme1':
-          this.changeToTheme1();
-          break;
-        case 'theme2':
-          this.changeToTheme2();
-          break;
-        case 'theme3':
-          this.changeToTheme3();
-          break;
-        case 'theme4':
-          this.changeToTheme4();
-          break;
-      }
-      
       if(Cookies.get('token')){
         /*User is logged in, so get his information from data base*/
         this.isLogged = true;
