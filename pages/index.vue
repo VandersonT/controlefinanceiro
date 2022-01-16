@@ -289,6 +289,9 @@
           this.sendNewTrasactionToLocalStorage()
         }
 
+        let alarm = new Audio('./media/audio/transactionSound.mp3');
+        alarm.play();
+
         /*Rests new transactions fields*/
         this.resetTransactionsFields();
       },
