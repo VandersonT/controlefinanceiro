@@ -353,12 +353,29 @@
         }
 
         localStorage.setItem('transactions', JSON.stringify(this.transactions));
+
+        console.log(this.transactions)
         this.netValueTotal = 0;
         this.savedValueTotal = 0;
-        for(let i = 0; i < this.transactions.length; i++){
-          this.netValueTotal = this.netValueTotal + this.transactions[i]['netValue'];
-          this.savedValueTotal = this.savedValueTotal + this.transactions[i]['savedValue'];
+        if(localStorage.getItem("transactions")){
+          for(let i = 0; i < this.transactions.length; i++){
+            
+            if(this.transactions[i]['takenFrom']){
+
+              if(this.transactions[i]['takenFrom'] == "Disponivel"){
+                this.netValueTotal = this.netValueTotal + this.transactions[i]['total'];
+              }else{
+                this.savedValueTotal = this.savedValueTotal + this.transactions[i]['total'];
+              }
+
+            }else{
+              this.netValueTotal = this.netValueTotal + this.transactions[i]['netValue'];
+              this.savedValueTotal = this.savedValueTotal + this.transactions[i]['savedValue'];
+            }
+            
+          }
         }
+        
       },
       idGenerator: function(){
         let char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -543,14 +560,33 @@
         this.loadingTransactionInfo = false;
         this.loadingTransactions = false;
 
-        
-        if(localStorage.getItem("transactions")){
+        /*if(localStorage.getItem("transactions")){
           this.transactions = JSON.parse(localStorage.getItem("transactions"));
           for(let i = 0; i < this.transactions.length; i++){
             this.netValueTotal = this.netValueTotal + this.transactions[i]['netValue'];
             this.savedValueTotal = this.savedValueTotal + this.transactions[i]['savedValue'];
           }
+        }*/
+        if(localStorage.getItem("transactions")){
+          this.transactions = JSON.parse(localStorage.getItem("transactions"));
+
+          for(let i = 0; i < this.transactions.length; i++){
+            
+            if(this.transactions[i]['takenFrom']){
+              if(this.transactions[i]['takenFrom'] == "Disponivel"){
+                this.netValueTotal = this.netValueTotal + this.transactions[i]['total'];
+              }else{
+                this.savedValueTotal = this.savedValueTotal + this.transactions[i]['total'];
+              }
+
+            }else{
+              this.netValueTotal = this.netValueTotal + this.transactions[i]['netValue'];
+              this.savedValueTotal = this.savedValueTotal + this.transactions[i]['savedValue'];
+            }
+            
+          }
         }
+      
       }
 
     }
