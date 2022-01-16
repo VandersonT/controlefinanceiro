@@ -13,7 +13,7 @@
                   <span>Disponivel</span>
                   <i @click="toggleNetValue()" class="fas fa-eye eyes" :class="showNetValue ? 'fa-eye' : 'fa-eye-slash'"></i>
                 </div>
-                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">{{showNetValue ? 'R$ '+netValueTotal.toLocaleString('pt-BR') : '-----'}}</p>
+                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">{{showNetValue ? (netValueTotal >= 0 ? 'R$ '+netValueTotal.toLocaleString('pt-BR') : netValueTotal.toLocaleString('pt-BR').replace('-', '-R$ ') )  : '-----'}}</p>
                 <p v-if="loadingTransactionInfo" class="loadingTransactionInfo">Carregando...</p>
               </div>
 
@@ -22,7 +22,7 @@
                   <span>Emergência</span>
                   <i @click="toggleSavedValue()" class="fas eyes" :class="showSavedValue ? 'fa-eye' : 'fa-eye-slash'"></i>
                 </div>
-                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">{{showSavedValue ? 'R$ '+savedValueTotal.toLocaleString('pt-BR') : '-----'}}</p>
+                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">{{showSavedValue ? (savedValueTotal >= 0 ? 'R$ '+savedValueTotal.toLocaleString('pt-BR') : savedValueTotal.toLocaleString('pt-BR').replace('-', '-R$ ')) : '-----'}}</p>
                 <p v-if="loadingTransactionInfo" class="loadingTransactionInfo">Carregando...</p>
               </div>
 
@@ -71,7 +71,7 @@
               <div @click="moreTransactionInfo(index)" class="transactionInfo">
                 <p>{{transaction['description']}}</p>
                 <div class="info2">
-                  <p class="negativeValue">R$ {{transaction['total'].toFixed(2).replace(".", ",")}}</p>
+                  <p class="negativeValue">{{transaction['total'].toFixed(2).replace(".", ",").replace('-', '-R$ ')}}</p>
                   <p class="arrow"><i class="fas fa-chevron-left"></i></p>
                 </div>
               </div>
@@ -82,7 +82,7 @@
                 </div>
                 <div class="fieldTransaction">
                   <p><b>Retirado do valor:</b> {{transaction['takenFrom']}}</p>
-                  <p><b>Valor Retirado:</b> R${{transaction['total']}}</p>
+                  <p><b>Valor Retirado:</b> {{transaction['total'].toFixed(2).replace('-', '-R$ ')}}</p>
                 </div>
                 <div class="boxButtons">
                   <button @click="deleteTransaction(transaction['id'], index)"><i class="fas fa-trash-alt trashIcon"></i></button>
