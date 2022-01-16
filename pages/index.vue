@@ -259,6 +259,17 @@
       deleteTransactionFromLocalStorage(index){
         this.transactions.splice(index, 1);
         localStorage.setItem('transactions', JSON.stringify(this.transactions));
+        this.transactions = JSON.parse(localStorage.getItem("transactions"));
+        if(this.transactions.length > 0){
+          for(let i = 0; i < this.transactions.length; i++){
+            this.netValueTotal = this.netValueTotal + this.transactions[i]['netValue'];
+            this.savedValueTotal = this.savedValueTotal + this.transactions[i]['savedValue'];
+          }
+        }else{
+          this.netValueTotal = 0;
+          this.savedValueTotal = 0;
+        }
+
       },
       selectAnAction: function(action){
         this.selectedTransaction = action;
