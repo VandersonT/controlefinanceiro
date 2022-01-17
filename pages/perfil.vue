@@ -91,7 +91,7 @@
         },
         methods: {
             async getUserInfo(token){
-                await this.$axios.$post('http://127.0.0.1:8000/api/auth',{
+                await this.$axios.$post('https://apicontrolefinanceiro.ga/api/auth',{
                     token: token
                 })
                 .then(response=>{
@@ -113,13 +113,13 @@
                 var photoUpdated = false;
 
                 if(fileVerify.value){
-                    await this.$axios.$post('http://127.0.0.1:8000/api/editUserAvatar/'+this.loggedUser['id'],data)
+                    await this.$axios.$post('https://apicontrolefinanceiro.ga/api/editUserAvatar/'+this.loggedUser['id'],data)
                     .finally(()=>{
                         photoUpdated = true;
                     })
                 }
 
-                await this.$axios.$put('http://127.0.0.1:8000/api/editUser/',{
+                await this.$axios.$put('https://apicontrolefinanceiro.ga/api/editUser',{
                     id: this.loggedUser['id'],
                     name: this.loggedUser['name'],
                     email: this.loggedUser['email'],
@@ -141,6 +141,7 @@
                 })
                 .finally(()=>{
                     this.changeProfileTheme();
+                    this.getUserInfo(Cookies.get('token'));
                     window.scrollTo({top: 0});
                 })
             },

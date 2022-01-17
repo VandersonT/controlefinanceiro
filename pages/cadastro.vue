@@ -56,7 +56,7 @@
                 if(!this.fieldsValidate())
                     return false;
 
-                let response = await this.$axios.$post('http://127.0.0.1:8000/api/newUser',{
+                let response = await this.$axios.$post('https://apicontrolefinanceiro.ga/api/newUser',{
                     name: this.name,
                     email: this.email,
                     pass: this.pass,

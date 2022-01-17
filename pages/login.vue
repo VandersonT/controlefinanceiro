@@ -65,7 +65,7 @@
                 if(!this.checkLogin())
                     return false;
 
-                let response = await this.$axios.$post('http://127.0.0.1:8000/api/login',{
+                let response = await this.$axios.$post('https://apicontrolefinanceiro.ga/api/login',{
                     email: this.email,
                     pass: this.password
                 });

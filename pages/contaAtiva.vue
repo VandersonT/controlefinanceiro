@@ -25,7 +25,7 @@
         },
         methods:{
             async getUserInfo(token){
-                await this.$axios.$post('http://127.0.0.1:8000/api/auth',{
+                await this.$axios.$post('https://apicontrolefinanceiro.ga/api/auth',{
                     token: token
                 })
                 .then(response=>{

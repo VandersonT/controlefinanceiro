@@ -248,7 +248,7 @@
         }
       },
       async deleteTransactionFromDb(idTransaction){
-        this.$axios.$delete('http://127.0.0.1:8000/api/deleteTransition/'+idTransaction)
+        this.$axios.$delete('https://apicontrolefinanceiro.ga/api/deleteTransition/'+idTransaction)
         .finally(()=>{
           if(this.transactions.length <= 1){
             this.currentPage = this.currentPage - 1;
@@ -322,7 +322,7 @@
         return true
       },  
       async sendNewTransactionToDb() {
-          let response = await this.$axios.$post('http://127.0.0.1:8000/api/newTransaction',{
+          let response = await this.$axios.$post('https://apicontrolefinanceiro.ga/api/newTransaction',{
               userId: this.loggedUser['id'],
               total: (this.selectedTransaction == 'deposit') ? this.totalTransactionAmount : (~parseFloat(this.totalTransactionAmount) + 1),
               description: this.titleTransaction,
@@ -466,7 +466,7 @@
       },
       async getLoggedUserInfo(token){
 
-        await this.$axios.$post('http://127.0.0.1:8000/api/auth',{
+        await this.$axios.$post('https://apicontrolefinanceiro.ga/api/auth',{
             token: token,
         })
         .then(response=>{
@@ -483,7 +483,7 @@
         
       },
       async getUserTransactionsInfo(){
-        await this.$axios.$get('http://127.0.0.1:8000/api/getUserFinancialInfo/'+this.loggedUser['id'])
+        await this.$axios.$get('https://apicontrolefinanceiro.ga/api/getUserFinancialInfo/'+this.loggedUser['id'])
         .then(response=>{
           this.savedValueTotal = response['saveValueTotal'];
           this.netValueTotal = response['netValueTotal'];
@@ -499,7 +499,7 @@
       },
       async getUserTransactions(page){
         let id = this.loggedUser['id'];
-        await this.$axios.$get('http://127.0.0.1:8000/api/userTransactions/'+this.loggedUser['id']+'?page='+page)
+        await this.$axios.$get('https://apicontrolefinanceiro.ga/api/userTransactions/'+this.loggedUser['id']+'?page='+page)
         .then(response=>{
           this.transactions = response.transactions.data;
           this.currentPage = response.transactions.current_page;
