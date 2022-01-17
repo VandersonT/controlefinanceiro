@@ -34,6 +34,7 @@
           <button class="newTransaction" @click="toggleBoxNewTransaction()"><i class="fas fa-plus"></i> Nova Transação</button>
           
           <warning v-if="loggedUser['access'] == 0" msg="Ative sua conta no seu email para usar o sistema sem nenhum problema."/>
+          <warning v-if="loggedUser['access'] == 0" msg="O email é enviado em até 5 min após o cadastro. Cheque sua caixa de Spam."/>
           
           <warning v-if="!isLogged" msg="Crie uma conta para ter acesso às suas transações de qualquer lugar."/>
 

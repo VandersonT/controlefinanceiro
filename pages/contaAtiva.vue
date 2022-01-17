@@ -14,9 +14,6 @@
 <script>
     import Cookies from 'js-cookie'
     export default {
-        beforeMount: function(){
-            (!Cookies.get('token')) ? this.$router.push('/') : '';
-        },
         head: {title: 'Conta Confirmada'},
         data: () => {
             return {

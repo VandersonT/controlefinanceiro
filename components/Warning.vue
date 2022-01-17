@@ -11,6 +11,7 @@
         background: rgb(5, 130, 233);
         color: rgb(233, 233, 233);
         padding: 5px;
+        margin: 5px 0;
         text-align: center;
         border-radius: 2px;
         font-size: 15px;
