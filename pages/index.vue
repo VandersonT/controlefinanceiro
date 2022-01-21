@@ -13,7 +13,7 @@
                   <span>Disponivel</span>
                   <i @click="toggleNetValue()" class="fas fa-eye eyes" :class="showNetValue ? 'fa-eye' : 'fa-eye-slash'"></i>
                 </div>
-                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">{{showNetValue ? (netValueTotal >= 0 ? 'R$ '+netValueTotal.toLocaleString('pt-BR') : netValueTotal.toLocaleString('pt-BR').replace('-', '-R$ ') )  : '-----'}}</p>
+                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value" :class="netValueTotal < 0 ? 'negativeValue' : ''" >{{showNetValue ? (netValueTotal >= 0 ? 'R$ '+netValueTotal.toLocaleString('pt-BR') : netValueTotal.toLocaleString('pt-BR').replace('-', '-R$ ') )  : '-----'}}</p>
                 <p v-if="loadingTransactionInfo" class="loadingTransactionInfo">Carregando...</p>
               </div>
 
@@ -22,7 +22,7 @@
                   <span>Emergência</span>
                   <i @click="toggleSavedValue()" class="fas eyes" :class="showSavedValue ? 'fa-eye' : 'fa-eye-slash'"></i>
                 </div>
-                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value">{{showSavedValue ? (savedValueTotal >= 0 ? 'R$ '+savedValueTotal.toLocaleString('pt-BR') : savedValueTotal.toLocaleString('pt-BR').replace('-', '-R$ ')) : '-----'}}</p>
+                <p v-if="!loadingTransactionInfo" class="infoFinanceSingle--value" :class="savedValueTotal < 0 ? 'negativeValue' : ''" >{{showSavedValue ? (savedValueTotal >= 0 ? 'R$ '+savedValueTotal.toLocaleString('pt-BR') : savedValueTotal.toLocaleString('pt-BR').replace('-', '-R$ ')) : '-----'}}</p>
                 <p v-if="loadingTransactionInfo" class="loadingTransactionInfo">Carregando...</p>
               </div>
 
@@ -900,6 +900,9 @@
 
     /*Main > boxTransactions*/
     .newTransaction{font-size: 14px;}
+    .boxTransactions{
+      margin-top: 80px;
+    }
   }
 
   @media screen and (max-width: 500px){
@@ -936,6 +939,8 @@
     .infoFinanceSingle--title span{font-size: 13px;}
     .up{font-size: 15px;}
     .emergency{font-size: 14px;}
+    .loadingTransactionInfo{font-size: 13px;}
     .infoFinanceSingle--value{font-size: 12px;}
+    
   }
 </style>

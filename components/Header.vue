@@ -2,7 +2,7 @@
     <header>
         <section class="welcomeUser" v-show="!loading">
             <img :src="(isLogged) ? loggedUser['avatar'] : 'images/no-picture.png' " alt="imagem de perfil" />
-            <p>Olá, {{isLogged ? loggedUser['name'] : 'Desconhecido'}}, tudo bom? <i class="far fa-smile-beam"></i></p>
+            <p>Olá, {{isLogged ? loggedUser['name'] : 'Desconhecido'}} <i class="far fa-smile-beam"></i></p>
         </section>
 
         <section class="menuDesktop" v-show="!loading">

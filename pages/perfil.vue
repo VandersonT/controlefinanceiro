@@ -360,6 +360,7 @@
     @media screen and (max-width: 500px){
         .styleInput{
             width: 90%;
+            font-size: 16px;
         }
     }
 </style>
