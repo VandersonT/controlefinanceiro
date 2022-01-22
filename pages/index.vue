@@ -330,7 +330,7 @@
           
           let response = await this.$axios.$post('https://apicontrolefinanceiro.ga/api/newTransaction',{
               userId: this.loggedUser['id'],
-              total: (this.selectedTransaction == 'deposit') ? this.totalTransactionAmount : (~parseFloat(this.totalTransactionAmount) + 1),
+              total: this.totalTransactionAmount,
               description: this.titleTransaction,
               date: this.date,
               takenFrom: this.takenFrom,
