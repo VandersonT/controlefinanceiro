@@ -72,7 +72,7 @@
               <div @click="moreTransactionInfo(index)" class="transactionInfo">
                 <p>{{transaction['description']}}</p>
                 <div class="info2">
-                  <p class="negativeValue">{{transaction['total'].toFixed(2).replace(".", ",").replace('-', '-R$ ')}}</p>
+                  <p class="negativeValue">{{transaction['total'].toLocaleString('pt-BR').replace('-', '-R$ ')}}</p>
                   <p class="arrow"><i class="fas fa-chevron-left"></i></p>
                 </div>
               </div>
@@ -83,7 +83,7 @@
                 </div>
                 <div class="fieldTransaction">
                   <p><b>Retirado do valor:</b> {{transaction['takenFrom']}}</p>
-                  <p><b>Valor Retirado:</b> {{transaction['total'].toFixed(2).replace('-', '-R$ ')}}</p>
+                  <p><b>Valor Retirado:</b> {{transaction['total'].toLocaleString('pt-BR').replace('-', '-R$ ')}}</p>
                 </div>
                 <div class="boxButtons">
                   <button @click="deleteTransaction(transaction['id'], index)"><i class="fas fa-trash-alt trashIcon"></i></button>
@@ -349,13 +349,12 @@
             this.transactions.unshift({id: id, description: this.titleTransaction, date: this.date, total: parseFloat(this.totalTransactionAmount), netValue: (parseFloat(this.totalTransactionAmount) - parseFloat(this.savedAmount)), savedValue: parseFloat(this.savedAmount)})
             break;
           case 'toWithdraw':
-            this.transactions.unshift({id: id, description: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, total: (~parseFloat(this.totalTransactionAmount) + 1)});
+            this.transactions.unshift({id: id, description: this.titleTransaction, date: this.date, takenFrom: this.takenFrom, total: this.totalTransactionAmount - (this.totalTransactionAmount * 2)});
             break;
         }
 
         localStorage.setItem('transactions', JSON.stringify(this.transactions));
 
-        console.log(this.transactions)
         this.netValueTotal = 0;
         this.savedValueTotal = 0;
         if(localStorage.getItem("transactions")){
