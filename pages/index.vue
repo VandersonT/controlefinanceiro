@@ -323,6 +323,11 @@
         return true
       },  
       async sendNewTransactionToDb() {
+          
+          if(this.selectedTransaction == 'toWithdraw'){
+            this.totalTransactionAmount = this.totalTransactionAmount - (this.totalTransactionAmount * 2)
+          }
+          
           let response = await this.$axios.$post('https://apicontrolefinanceiro.ga/api/newTransaction',{
               userId: this.loggedUser['id'],
               total: (this.selectedTransaction == 'deposit') ? this.totalTransactionAmount : (~parseFloat(this.totalTransactionAmount) + 1),
